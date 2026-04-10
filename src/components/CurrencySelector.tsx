@@ -12,7 +12,7 @@ interface CurrencySelectorProps {
   className?: string;
 }
 
-const CATEGORIES = ["base", "stable", "major", "alt"] as const;
+const CATEGORIES = ["stable", "major", "alt"] as const;
 
 export default function CurrencySelector({
   value,

@@ -103,17 +103,19 @@ export default function Home() {
         <h2 className="text-center text-2xl font-semibold text-foreground mb-8 tracking-tight">
           {t("home.yield.title")}
         </h2>
-        <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {YIELD_TYPES.map((yt) => (
             <div
               key={yt.titleKey}
-              className="tech-card flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 text-center"
+              className="tech-card flex items-start gap-4 rounded-2xl border border-border bg-card p-5"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20">
                 <yt.icon size={22} className="text-accent" />
               </div>
-              <h4 className="text-base font-semibold text-foreground">{t(yt.titleKey)}</h4>
-              <p className="text-sm leading-relaxed text-muted">{t(yt.descKey)}</p>
+              <div>
+                <h4 className="text-base font-semibold text-foreground">{t(yt.titleKey)}</h4>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{t(yt.descKey)}</p>
+              </div>
             </div>
           ))}
         </div>

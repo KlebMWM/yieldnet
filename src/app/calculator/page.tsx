@@ -31,7 +31,7 @@ function CalculatorContent() {
 
   const [sourceChainId, setSourceChainId] = useState(1);
   const [destChainId, setDestChainId] = useState(presetChain ? Number(presetChain) : 42161);
-  const [currency, setCurrency] = useState(presetToken || "USD");
+  const [currency, setCurrency] = useState(presetToken || "USDC");
   const [amount, setAmount] = useState(() => presetToken && presetToken !== "USD" ? fromUSD(1000, presetToken) : 1000);
   const [apy, setApy] = useState(presetApy ? Number(presetApy) : 8);
   const [holdingDays, setHoldingDays] = useState(90);

@@ -46,15 +46,35 @@ const dict = {
   // home explainer — yield types
   "home.yield.title": { en: "Yield Types YieldNet Covers", "zh-TW": "YieldNet 涵蓋的收益類型", "zh-CN": "YieldNet 涵盖的收益类型" },
   "home.yield.lending": { en: "Lending", "zh-TW": "借貸", "zh-CN": "借贷" },
-  "home.yield.lending.desc": { en: "Earn interest by supplying assets to protocols like Aave and Morpho", "zh-TW": "將資產存入 Aave、Morpho 等協議賺取利息", "zh-CN": "将资产存入 Aave、Morpho 等协议赚取利息" },
+  "home.yield.lending.desc": {
+    en: "Like a bank deposit — you lend your crypto to others and earn interest. Protocols like Aave and Morpho match lenders with borrowers automatically.",
+    "zh-TW": "就像銀行定存 — 你把加密貨幣借給別人，自動賺取利息。Aave、Morpho 等協議會自動撮合借貸雙方",
+    "zh-CN": "就像银行定存 — 你把加密货币借给别人，自动赚取利息。Aave、Morpho 等协议会自动撮合借贷双方",
+  },
   "home.yield.lp": { en: "Liquidity Pools", "zh-TW": "流動性池", "zh-CN": "流动性池" },
-  "home.yield.lp.desc": { en: "Provide liquidity on Uniswap, Curve, etc. and earn trading fees", "zh-TW": "在 Uniswap、Curve 等提供流動性，賺取交易手續費", "zh-CN": "在 Uniswap、Curve 等提供流动性，赚取交易手续费" },
+  "home.yield.lp.desc": {
+    en: "You put tokens into a shared pool so others can trade. Every trade pays a fee, and you earn a cut. Used by Uniswap, Curve, etc.",
+    "zh-TW": "你把代幣放進一個共用的池子，讓其他人可以交易。每筆交易都會產生手續費，你按比例分潤。Uniswap、Curve 等都是這種模式",
+    "zh-CN": "你把代币放进一个共用的池子，让其他人可以交易。每笔交易都会产生手续费，你按比例分润。Uniswap、Curve 等都是这种模式",
+  },
   "home.yield.farming": { en: "Yield Farming", "zh-TW": "收益耕作", "zh-CN": "收益耕作" },
-  "home.yield.farming.desc": { en: "Stake LP tokens for bonus token rewards from protocols", "zh-TW": "質押 LP 代幣，獲取協議額外發放的獎勵代幣", "zh-CN": "质押 LP 代币，获取协议额外发放的奖励代币" },
+  "home.yield.farming.desc": {
+    en: "Protocols give out bonus tokens to attract users. You deposit and receive extra rewards on top of normal yield — like a signup bonus.",
+    "zh-TW": "協議為了吸引用戶，會額外發放獎勵代幣。你存入資金後，除了正常收益，還能領到額外的獎勵 — 像是開戶禮",
+    "zh-CN": "协议为了吸引用户，会额外发放奖励代币。你存入资金后，除了正常收益，还能领到额外的奖励 — 像是开户礼",
+  },
   "home.yield.staking": { en: "Staking", "zh-TW": "質押", "zh-CN": "质押" },
-  "home.yield.staking.desc": { en: "Lock tokens to secure the network and earn staking rewards", "zh-TW": "鎖定代幣支持網路安全運作，獲取質押獎勵", "zh-CN": "锁定代币支持网络安全运作，获取质押奖励" },
+  "home.yield.staking.desc": {
+    en: "Lock your tokens to help run the blockchain. In return, you earn rewards — similar to earning dividends for holding stock.",
+    "zh-TW": "鎖定你的代幣來幫助區塊鏈運作，獲取獎勵回報 — 類似持有股票領股息的概念",
+    "zh-CN": "锁定你的代币来帮助区块链运作，获取奖励回报 — 类似持有股票领股息的概念",
+  },
   "home.yield.strategy": { en: "Strategies", "zh-TW": "組合策略", "zh-CN": "组合策略" },
-  "home.yield.strategy.desc": { en: "Auto-compounding, leveraged farming, and multi-step strategies", "zh-TW": "自動複利、槓桿耕作、多步驟組合等進階策略", "zh-CN": "自动复利、杠杆耕作、多步骤组合等进阶策略" },
+  "home.yield.strategy.desc": {
+    en: "Advanced vaults that auto-manage your funds — auto-compounding, combining multiple yield sources, or adjusting positions for you.",
+    "zh-TW": "進階的自動化策略 — 幫你自動複利、組合多種收益來源、或自動調整部位，像是請了一個理財機器人",
+    "zh-CN": "进阶的自动化策略 — 帮你自动复利、组合多种收益来源、或自动调整部位，像是请了一个理财机器人",
+  },
 
   // home problem/solution
   "home.problem.title": { en: "The Hidden Cost Problem", "zh-TW": "隱藏成本的陷阱", "zh-CN": "隐藏成本的陷阱" },
