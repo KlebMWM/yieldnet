@@ -71,7 +71,6 @@ function DashboardContent() {
     return { amt: a >= 1000 ? `$${a / 1000}K` : `$${a}`, [beLabel]: c.breakEvenDays === Infinity ? 999 : Math.ceil(c.breakEvenDays), [netApyLabel]: +c.netAPY.toFixed(2) };
   }), [apy, cost, days, beLabel, netApyLabel]);
 
-  const dU = t("axis.days");
   const tip = { backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", fontSize: "13px", color: "var(--foreground)" };
 
   return (
@@ -101,7 +100,7 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={timeSeriesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v} ${dU}`} />
+              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} />
               <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} />
               <Tooltip contentStyle={tip} labelFormatter={(v) => t("chart.day", { d: v })} formatter={(value) => [`$${Number(value).toFixed(2)}`]} />
               <Area type="monotone" dataKey={grossLabel} stroke="var(--green)" fill="var(--green)" fillOpacity={0.08} strokeWidth={2} />
@@ -117,12 +116,12 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={breakevenData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v} ${dU}`} />
+              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} />
               <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} />
               <Tooltip contentStyle={tip} labelFormatter={(v) => t("chart.day", { d: v })} formatter={(value) => [`$${Number(value).toFixed(2)}`]} />
               <Area type="monotone" dataKey={accLabel} stroke="var(--green)" fill="var(--green)" fillOpacity={0.1} strokeWidth={2} />
               <Area type="monotone" dataKey={feesLabel} stroke="var(--red)" fill="var(--red)" fillOpacity={0.05} strokeWidth={2} strokeDasharray="6 3" />
-              {beDays && <ReferenceLine x={beDays} stroke="var(--yellow)" strokeWidth={2} strokeDasharray="3 3" label={{ value: `${beDays}${dU}`, position: "top", fill: "var(--yellow)", fontSize: 12 }} />}
+              {beDays && <ReferenceLine x={beDays} stroke="var(--yellow)" strokeWidth={2} strokeDasharray="3 3" label={{ value: `${beDays}d`, position: "top", fill: "var(--yellow)", fontSize: 12 }} />}
               <Legend wrapperStyle={{ fontSize: "13px" }} />
             </AreaChart>
           </ResponsiveContainer>
@@ -137,8 +136,8 @@ function DashboardContent() {
             <BarChart data={amtData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="amt" stroke="var(--muted)" fontSize={12} />
-              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v} ${dU}`} width={55} />
-              <Tooltip contentStyle={tip} formatter={(value) => [`${value} ${dU}`]} />
+              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} width={55} />
+              <Tooltip contentStyle={tip} formatter={(value) => [`${value}`]} />
               <Bar dataKey={beLabel} fill="var(--yellow)" radius={[4, 4, 0, 0]} />
               <Legend wrapperStyle={{ fontSize: "13px" }} />
             </BarChart>
