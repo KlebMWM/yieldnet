@@ -131,7 +131,7 @@ function DashboardContent() {
           </div>
         </Panel>
 
-        <Panel title={`${t("dash.chart3")}（${apy}% APY）`}>
+        <Panel title={`${t("dash.chart3")} | ${apy}% APY`}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={amtData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -145,7 +145,7 @@ function DashboardContent() {
           <p className="mt-3 text-sm text-muted">{t("dash.chart3.note")}</p>
         </Panel>
 
-        <Panel title={`${t("dash.chart4")}（${t("dash.grossLabel")} APY ${apy}%）`}>
+        <Panel title={`${t("dash.chart4")} | ${t("dash.grossLabel")} APY ${apy}%`}>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={amtData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />

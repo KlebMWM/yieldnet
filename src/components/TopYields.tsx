@@ -118,47 +118,44 @@ export default function TopYields() {
             <button
               key={`${vault.chainId}-${vault.address}`}
               onClick={() => handleClick(vault)}
-              className="tech-card group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 text-left transition-all hover:border-accent/30 hover:bg-card-hover active:scale-[0.98] md:p-5"
+              className="tech-card group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-accent/30 hover:bg-card-hover active:scale-[0.98]"
             >
-              {/* Token Icon as Rank Badge */}
-              <div className="relative shrink-0">
-                <TokenIcon symbol={vault.tokenSymbol} size={44} />
-                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
-                  {i + 1}
+              {/* Top row: icon + APY */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <TokenIcon symbol={vault.tokenSymbol} size={40} />
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+                      {i + 1}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-foreground truncate">{vault.name}</p>
+                    <p className="text-sm text-muted">{vault.tokenSymbol}</p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="flex items-center gap-1 text-green">
+                    <TrendingUp size={14} />
+                    <span className="data-mono text-xl font-bold">{formatAPY(vault.apy)}</span>
+                  </div>
+                  <span className="text-xs text-muted">APY</span>
+                </div>
+              </div>
+
+              {/* Tags row */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: chain.color }} />
+                <span className="text-sm text-muted">{chain.shortName}</span>
+                <span className="rounded-lg bg-accent/8 px-2 py-0.5 text-xs text-accent">{vault.protocol}</span>
+                <span className={`shrink-0 whitespace-nowrap rounded-lg px-2 py-0.5 text-xs font-medium ${YIELD_TYPE_COLORS[vault.yieldType]}`}>
+                  {t(YIELD_TYPE_KEYS[vault.yieldType])}
                 </span>
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span
-                    className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: chain.color }}
-                  />
-                  <span className="text-sm text-muted truncate">
-                    {chain.shortName} · {vault.protocol}
-                  </span>
-                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${YIELD_TYPE_COLORS[vault.yieldType]}`}>
-                    {t(YIELD_TYPE_KEYS[vault.yieldType])}
-                  </span>
-                </div>
-                <p className="text-base font-semibold text-foreground truncate">
-                  {vault.name}
-                </p>
-                <p className="text-sm text-muted mt-0.5">
-                  TVL <span className="data-mono">{formatTVL(vault.tvl)}</span>
-                </p>
-              </div>
-
-              {/* APY */}
-              <div className="text-right shrink-0">
-                <div className="flex items-center gap-1 text-green">
-                  <TrendingUp size={14} />
-                  <span className="data-mono text-xl font-bold md:text-2xl">
-                    {formatAPY(vault.apy)}
-                  </span>
-                </div>
-                <span className="text-xs text-muted">APY</span>
+              {/* TVL */}
+              <div className="border-t border-border pt-2">
+                <p className="text-sm text-muted">TVL <span className="data-mono font-medium text-foreground">{formatTVL(vault.tvl)}</span></p>
               </div>
             </button>
           );
