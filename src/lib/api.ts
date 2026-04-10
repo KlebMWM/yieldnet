@@ -34,12 +34,14 @@ interface EarnApiVault {
 }
 
 /** Classify vault into a yield type based on protocol and data */
-function classifyYieldType(proto: string, tags: string[], tokenCount: number, hasReward: boolean): YieldType {
+function classifyYieldType(proto: string, tags: string[], tokenCount: number, hasReward: boolean, tokenSymbol: string): YieldType {
   const p = proto.toLowerCase();
-  // Staking protocols
-  if (p.includes("ether.fi") || p.includes("etherfi") || p.includes("kelp") || p.includes("kinetiq") || p.includes("lido")) return "staking";
-  // Strategy / aggregator protocols
-  if (p.includes("pendle") || p.includes("yearn") || p.includes("beefy") || p.includes("convex")) return "strategy";
+  const sym = tokenSymbol.toLowerCase();
+  // Staking protocols or liquid staking tokens
+  if (p.includes("ether.fi") || p.includes("etherfi") || p.includes("kelp") || p.includes("kinetiq") || p.includes("lido") || p.includes("stake") || p.includes("rocket") || p.includes("stader")) return "staking";
+  if (sym.includes("steth") || sym.includes("reth") || sym.includes("weeth") || sym.includes("cbeth") || sym.includes("sfrx")) return "staking";
+  // Strategy / aggregator / synthetic protocols
+  if (p.includes("pendle") || p.includes("yearn") || p.includes("beefy") || p.includes("convex") || p.includes("ethena") || p.includes("sommelier") || p.includes("gearbox")) return "strategy";
   // LP / multi-token
   if (tokenCount > 1 || tags.includes("multi") || tags.includes("il-risk")) return "lp";
   // Has extra reward tokens → farming
@@ -80,7 +82,7 @@ export async function fetchVaults(): Promise<Vault[]> {
         tokenSymbol: v.underlyingTokens?.[0]?.symbol ?? "???",
         tokenAddress: v.underlyingTokens?.[0]?.address ?? "",
         tokenDecimals: v.underlyingTokens?.[0]?.decimals ?? 18,
-        yieldType: classifyYieldType(proto, tags as string[], tokenCount, hasReward),
+        yieldType: classifyYieldType(proto, tags as string[], tokenCount, hasReward, v.underlyingTokens?.[0]?.symbol ?? ""),
         hasReward,
       };
     })

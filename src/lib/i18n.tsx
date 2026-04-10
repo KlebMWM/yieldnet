@@ -255,11 +255,11 @@ const dict = {
   "chart.breakevenDays": { en: "Break-even Days", "zh-TW": "損益兩平天數", "zh-CN": "损益平衡天数" },
   "chart.netApy": { en: "Net APY", "zh-TW": "淨 APY", "zh-CN": "净 APY" },
   "chart.day": { en: "Day {d}", "zh-TW": "第 {d} 天", "zh-CN": "第 {d} 天" },
-  "axis.days": { en: "Days", "zh-TW": "天數", "zh-CN": "天数" },
-  "axis.amount": { en: "Amount (USD)", "zh-TW": "金額（USD）", "zh-CN": "金额（USD）" },
-  "axis.depositAmount": { en: "Deposit Amount", "zh-TW": "存入金額", "zh-CN": "存入金额" },
-  "axis.breakevenDays": { en: "Days to Break Even", "zh-TW": "回本所需天數", "zh-CN": "回本所需天数" },
-  "axis.netApyPercent": { en: "Net APY (%)", "zh-TW": "淨 APY（%）", "zh-CN": "净 APY（%）" },
+  "axis.days": { en: "Days", "zh-TW": "天", "zh-CN": "天" },
+  "axis.amount": { en: "USD", "zh-TW": "USD", "zh-CN": "USD" },
+  "axis.depositAmount": { en: "Deposit", "zh-TW": "存入金額", "zh-CN": "存入金额" },
+  "axis.breakevenDays": { en: "Days", "zh-TW": "天", "zh-CN": "天" },
+  "axis.netApyPercent": { en: "%", "zh-TW": "%", "zh-CN": "%" },
 
   // top yields
   "top.title": { en: "Top Yields Right Now", "zh-TW": "當前最佳收益", "zh-CN": "当前最佳收益" },

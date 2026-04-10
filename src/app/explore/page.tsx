@@ -10,6 +10,14 @@ import { useI18n } from "@/lib/i18n";
 
 type SortKey = "apy" | "tvl" | "name";
 
+const YIELD_TYPE_KEYS = {
+  lending: "vault.type.lending",
+  staking: "vault.type.staking",
+  farming: "vault.type.farming",
+  strategy: "vault.type.strategy",
+  lp: "vault.type.lp",
+} as const;
+
 export default function ExplorePage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -31,6 +39,11 @@ export default function ExplorePage() {
 
   const protocols = useMemo(() => Array.from(new Set(vaults.map((v) => v.protocol))).sort(), [vaults]);
   const chainIds = useMemo(() => Array.from(new Set(vaults.map((v) => v.chainId))).sort((a, b) => a - b), [vaults]);
+  const typeCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const v of vaults) counts[v.yieldType] = (counts[v.yieldType] || 0) + 1;
+    return counts;
+  }, [vaults]);
 
   const filtered = useMemo(() => {
     let result = vaults;
@@ -127,11 +140,11 @@ export default function ExplorePage() {
           <select value={typeFilter ?? ""} onChange={(e) => setTypeFilter((e.target.value || null) as YieldType | null)}
             className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
             <option value="">{t("explore.allTypes")}</option>
-            <option value="lending">{t("vault.type.lending")}</option>
-            <option value="staking">{t("vault.type.staking")}</option>
-            <option value="farming">{t("vault.type.farming")}</option>
-            <option value="strategy">{t("vault.type.strategy")}</option>
-            <option value="lp">{t("vault.type.lp")}</option>
+            {(["lending", "farming", "staking", "strategy", "lp"] as YieldType[])
+              .filter((ty) => (typeCounts[ty] || 0) > 0)
+              .map((ty) => (
+                <option key={ty} value={ty}>{t(YIELD_TYPE_KEYS[ty])} ({typeCounts[ty]})</option>
+              ))}
           </select>
 
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}
