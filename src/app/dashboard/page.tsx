@@ -71,7 +71,14 @@ function DashboardContent() {
     return { amt: a >= 1000 ? `$${a / 1000}K` : `$${a}`, [beLabel]: c.breakEvenDays === Infinity ? 999 : Math.ceil(c.breakEvenDays), [netApyLabel]: +c.netAPY.toFixed(2) };
   }), [apy, cost, days, beLabel, netApyLabel]);
 
+  const axDays = t("axis.days");
+  const axAmount = t("axis.amount");
+  const axDeposit = t("axis.depositAmount");
+  const axBeDays = t("axis.breakevenDays");
+  const axNetApy = t("axis.netApyPercent");
+
   const tip = { backgroundColor: "var(--card)", border: "1px solid var(--border)", borderRadius: "12px", fontSize: "13px", color: "var(--foreground)" };
+  const axisLabelStyle = { fill: "var(--muted)", fontSize: 12 };
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-6 animate-fade-in md:py-8">
@@ -100,8 +107,8 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={timeSeriesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} />
-              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} />
+              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} label={{ value: axDays, position: "insideBottomRight", offset: -5, style: axisLabelStyle }} />
+              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} label={{ value: axAmount, angle: -90, position: "insideLeft", offset: 10, style: axisLabelStyle }} />
               <Tooltip contentStyle={tip} labelFormatter={(v) => t("chart.day", { d: v })} formatter={(value) => [`$${Number(value).toFixed(2)}`]} />
               <Area type="monotone" dataKey={grossLabel} stroke="var(--green)" fill="var(--green)" fillOpacity={0.08} strokeWidth={2} />
               <Area type="monotone" dataKey={netLabel} stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.08} strokeWidth={2} />
@@ -116,8 +123,8 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={breakevenData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} />
-              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} />
+              <XAxis dataKey="day" stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}`} label={{ value: axDays, position: "insideBottomRight", offset: -5, style: axisLabelStyle }} />
+              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `$${v}`} width={55} label={{ value: axAmount, angle: -90, position: "insideLeft", offset: 10, style: axisLabelStyle }} />
               <Tooltip contentStyle={tip} labelFormatter={(v) => t("chart.day", { d: v })} formatter={(value) => [`$${Number(value).toFixed(2)}`]} />
               <Area type="monotone" dataKey={accLabel} stroke="var(--green)" fill="var(--green)" fillOpacity={0.1} strokeWidth={2} />
               <Area type="monotone" dataKey={feesLabel} stroke="var(--red)" fill="var(--red)" fillOpacity={0.05} strokeWidth={2} strokeDasharray="6 3" />
@@ -135,8 +142,8 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={amtData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="amt" stroke="var(--muted)" fontSize={12} />
-              <YAxis stroke="var(--muted)" fontSize={12} width={45} />
+              <XAxis dataKey="amt" stroke="var(--muted)" fontSize={12} label={{ value: axDeposit, position: "insideBottomRight", offset: -5, style: axisLabelStyle }} />
+              <YAxis stroke="var(--muted)" fontSize={12} width={45} label={{ value: axBeDays, angle: -90, position: "insideLeft", offset: 5, style: axisLabelStyle }} />
               <Tooltip contentStyle={tip} formatter={(value) => [`${value}`]} />
               <Bar dataKey={beLabel} fill="var(--yellow)" radius={[4, 4, 0, 0]} />
               <Legend wrapperStyle={{ fontSize: "13px" }} />
@@ -149,8 +156,8 @@ function DashboardContent() {
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={amtData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="amt" stroke="var(--muted)" fontSize={12} />
-              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}%`} width={45} />
+              <XAxis dataKey="amt" stroke="var(--muted)" fontSize={12} label={{ value: axDeposit, position: "insideBottomRight", offset: -5, style: axisLabelStyle }} />
+              <YAxis stroke="var(--muted)" fontSize={12} tickFormatter={(v) => `${v}%`} width={45} label={{ value: axNetApy, angle: -90, position: "insideLeft", offset: 5, style: axisLabelStyle }} />
               <Tooltip contentStyle={tip} formatter={(value) => [`${Number(value).toFixed(2)}%`]} />
               <Line type="monotone" dataKey={netApyLabel} stroke="var(--accent-light)" strokeWidth={2} dot={{ fill: "var(--accent-light)", r: 3 }} />
               <ReferenceLine y={apy} stroke="var(--green)" strokeDasharray="3 3" />
