@@ -95,6 +95,56 @@ export function estimateFrictionCost(
   };
 }
 
+/**
+ * Fetch a real cross-chain cost quote from LI.FI Composer API.
+ * Returns gas + bridge fee + estimated slippage in USD.
+ * Falls back to null on any error so caller can use static estimates.
+ */
+export async function fetchRealQuote(
+  fromChainId: number,
+  toChainId: number,
+  fromToken: string,
+  toToken: string,
+  fromAmountSmallest: string,
+): Promise<{ gasCostUSD: number; bridgeFeeUSD: number; slippageCostUSD: number; totalCostUSD: number; bridgeTimeMin: number } | null> {
+  try {
+    const params = new URLSearchParams({
+      fromChain: String(fromChainId),
+      toChain: String(toChainId),
+      fromToken,
+      toToken,
+      fromAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      toAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      fromAmount: fromAmountSmallest,
+    });
+    const res = await fetch(`/api/quote?${params.toString()}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+
+    // Extract cost info from the quote response
+    const estimate = data.estimate;
+    if (!estimate) return null;
+
+    const fromAmountUSD = Number(estimate.fromAmountUSD ?? 0);
+    const toAmountUSD = Number(estimate.toAmountUSD ?? 0);
+    const gasCosts = estimate.gasCosts ?? [];
+    const feeCosts = estimate.feeCosts ?? [];
+
+    const gasCostUSD = gasCosts.reduce((sum: number, g: { amountUSD?: string }) => sum + Number(g.amountUSD ?? 0), 0);
+    const bridgeFeeUSD = feeCosts.reduce((sum: number, f: { amountUSD?: string }) => sum + Number(f.amountUSD ?? 0), 0);
+    const slippageCostUSD = Math.max(0, fromAmountUSD - toAmountUSD - gasCostUSD - bridgeFeeUSD);
+    const totalCostUSD = gasCostUSD + bridgeFeeUSD + slippageCostUSD;
+
+    // Estimate bridge time from execution duration
+    const executionDuration = data.action?.executionDuration ?? estimate.executionDuration ?? 300;
+    const bridgeTimeMin = Math.ceil(executionDuration / 60);
+
+    return { gasCostUSD, bridgeFeeUSD, slippageCostUSD, totalCostUSD, bridgeTimeMin };
+  } catch {
+    return null;
+  }
+}
+
 export function calculateNetYield(
   depositAmount: number,
   apyPercent: number,

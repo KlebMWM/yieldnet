@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useState, useMemo } from "react";
+import { Suspense, useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { getChainInfo, getChainList } from "@/lib/chains";
-import { estimateFrictionCost, calculateNetYield } from "@/lib/api";
+import { getChainInfo, getChainList, USDC_ADDRESSES } from "@/lib/chains";
+import { estimateFrictionCost, calculateNetYield, fetchRealQuote, FrictionCost } from "@/lib/api";
 import { toUSD, fromUSD, formatTokenAmount, getToken } from "@/lib/tokens";
 import CurrencySelector from "@/components/CurrencySelector";
 import { useI18n } from "@/lib/i18n";
-import { ArrowRight, Clock, Fuel, ArrowLeftRight, TrendingDown, BarChart3, Info } from "lucide-react";
+import { ArrowRight, Clock, Fuel, ArrowLeftRight, TrendingDown, BarChart3, Info, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default function CalculatorPage() {
@@ -36,12 +36,66 @@ function CalculatorContent() {
   const [apy, setApy] = useState(presetApy ? Number(presetApy) : 8);
   const [holdingDays, setHoldingDays] = useState(90);
   const [slippageBps, setSlippageBps] = useState(30);
+  const [liveQuote, setLiveQuote] = useState<{ gasCostUSD: number; bridgeFeeUSD: number; slippageCostUSD: number; totalCostUSD: number; bridgeTimeMin: number } | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [isLiveData, setIsLiveData] = useState(false);
 
   const amountUSD = toUSD(amount, currency);
   const sourceChain = getChainInfo(sourceChainId);
   const destChain = getChainInfo(destChainId);
 
-  const friction = useMemo(() => {
+  // Fetch real quote from LI.FI Composer when chains differ
+  const fetchQuote = useCallback(async () => {
+    if (sourceChainId === destChainId || amountUSD < 1) {
+      setLiveQuote(null);
+      setIsLiveData(false);
+      return;
+    }
+    const fromToken = USDC_ADDRESSES[sourceChainId];
+    const toToken = USDC_ADDRESSES[destChainId];
+    if (!fromToken || !toToken) {
+      setLiveQuote(null);
+      setIsLiveData(false);
+      return;
+    }
+    // USDC has 6 decimals
+    const fromAmount = String(Math.round(Math.min(amountUSD, 100000) * 1e6));
+    setQuoteLoading(true);
+    const result = await fetchRealQuote(sourceChainId, destChainId, fromToken, toToken, fromAmount);
+    setQuoteLoading(false);
+    if (result) {
+      // Scale slippage proportionally if actual amount differs from quote amount
+      const quotedAmountUSD = Math.min(amountUSD, 100000);
+      const scale = amountUSD / quotedAmountUSD;
+      setLiveQuote({
+        ...result,
+        slippageCostUSD: result.slippageCostUSD * scale,
+        totalCostUSD: result.gasCostUSD + result.bridgeFeeUSD + result.slippageCostUSD * scale,
+      });
+      setIsLiveData(true);
+    } else {
+      setLiveQuote(null);
+      setIsLiveData(false);
+    }
+  }, [sourceChainId, destChainId, amountUSD]);
+
+  // Debounce quote fetching
+  useEffect(() => {
+    const timer = setTimeout(fetchQuote, 800);
+    return () => clearTimeout(timer);
+  }, [fetchQuote]);
+
+  const friction: FrictionCost = useMemo(() => {
+    if (liveQuote && sourceChainId !== destChainId) {
+      return {
+        sourceChain: sourceChain.name, destChain: destChain.name,
+        gasCostUSD: liveQuote.gasCostUSD,
+        bridgeFeeUSD: liveQuote.bridgeFeeUSD,
+        slippageCostUSD: liveQuote.slippageCostUSD,
+        totalCostUSD: liveQuote.totalCostUSD,
+        bridgeTimeMin: liveQuote.bridgeTimeMin,
+      };
+    }
     if (sourceChainId === destChainId) {
       return {
         sourceChain: sourceChain.name, destChain: destChain.name,
@@ -55,7 +109,7 @@ function CalculatorContent() {
     cost.sourceChain = sourceChain.name;
     cost.destChain = destChain.name;
     return cost;
-  }, [sourceChainId, destChainId, amountUSD, slippageBps, sourceChain, destChain]);
+  }, [sourceChainId, destChainId, amountUSD, slippageBps, sourceChain, destChain, liveQuote]);
 
   const roundTripCost = friction.totalCostUSD * 2;
   const yieldCalc = useMemo(() => calculateNetYield(amountUSD, apy, roundTripCost, holdingDays), [amountUSD, apy, roundTripCost, holdingDays]);
@@ -149,7 +203,18 @@ function CalculatorContent() {
         {/* Results */}
         <div className="space-y-5">
           <div className="tech-card rounded-2xl border border-border bg-card p-5 md:p-6">
-            <h2 className="text-base font-semibold text-foreground mb-4">{t("calc.oneWay")}</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-foreground">{t("calc.oneWay")}</h2>
+              {quoteLoading && <span className="text-xs text-muted animate-pulse">{t("calc.quoting")}</span>}
+              {!quoteLoading && isLiveData && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2.5 py-0.5 text-xs font-medium text-green">
+                  <Zap size={10} /> {t("calc.liveQuote")}
+                </span>
+              )}
+              {!quoteLoading && !isLiveData && sourceChainId !== destChainId && (
+                <span className="text-xs text-muted">{t("calc.estimated")}</span>
+              )}
+            </div>
             <div className="space-y-4">
               <CostRow icon={<Fuel size={18} />} label={t("calc.gas")} value={fmt(friction.gasCostUSD)} />
               <CostRow icon={<ArrowLeftRight size={18} />} label={t("calc.bridge")} value={fmt(friction.bridgeFeeUSD)} />
