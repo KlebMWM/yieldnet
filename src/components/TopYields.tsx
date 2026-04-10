@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchVaults, Vault } from "@/lib/api";
+import { fetchVaults, Vault, YieldType } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import { useI18n } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,22 @@ function formatAPY(apy: number): string {
   const pct = apy > 1 ? apy : apy * 100;
   return `${pct.toFixed(2)}%`;
 }
+
+const YIELD_TYPE_COLORS: Record<YieldType, string> = {
+  lending: "bg-accent/10 text-accent",
+  staking: "bg-cyan/10 text-cyan",
+  farming: "bg-green/10 text-green",
+  strategy: "bg-gold/10 text-gold",
+  lp: "bg-red/10 text-red",
+};
+
+const YIELD_TYPE_KEYS = {
+  lending: "vault.type.lending",
+  staking: "vault.type.staking",
+  farming: "vault.type.farming",
+  strategy: "vault.type.strategy",
+  lp: "vault.type.lp",
+} as const;
 
 function formatTVL(n: number): string {
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
@@ -121,6 +137,9 @@ export default function TopYields() {
                   />
                   <span className="text-sm text-muted truncate">
                     {chain.shortName} · {vault.protocol}
+                  </span>
+                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${YIELD_TYPE_COLORS[vault.yieldType]}`}>
+                    {t(YIELD_TYPE_KEYS[vault.yieldType])}
                   </span>
                 </div>
                 <p className="text-base font-semibold text-foreground truncate">

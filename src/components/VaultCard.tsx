@@ -1,9 +1,25 @@
 "use client";
 
-import { Vault } from "@/lib/api";
+import { Vault, YieldType } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import { useI18n } from "@/lib/i18n";
 import TokenIcon from "./TokenIcon";
+
+const YIELD_TYPE_COLORS: Record<YieldType, string> = {
+  lending: "bg-accent/10 text-accent border-accent/20",
+  staking: "bg-cyan/10 text-cyan border-cyan/20",
+  farming: "bg-green/10 text-green border-green/20",
+  strategy: "bg-gold/10 text-gold border-gold/20",
+  lp: "bg-red/10 text-red border-red/20",
+};
+
+const YIELD_TYPE_KEYS = {
+  lending: "vault.type.lending",
+  staking: "vault.type.staking",
+  farming: "vault.type.farming",
+  strategy: "vault.type.strategy",
+  lp: "vault.type.lp",
+} as const;
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
@@ -43,6 +59,9 @@ export default function VaultCard({ vault, onSelect }: VaultCardProps) {
           <div className="h-3 w-3 rounded-full" style={{ backgroundColor: chain.color }} />
           <span className="text-sm text-muted">{chain.shortName}</span>
           <span className="rounded-lg bg-accent/8 px-2 py-0.5 text-xs text-accent">{vault.protocol}</span>
+          <span className={`rounded-lg border px-2 py-0.5 text-xs ${YIELD_TYPE_COLORS[vault.yieldType]}`}>
+            {t(YIELD_TYPE_KEYS[vault.yieldType])}
+          </span>
         </div>
         <span className={`data-mono text-xl font-bold ${getAPYColor(vault.apy)}`}>{fmtAPY(vault.apy)}</span>
       </div>

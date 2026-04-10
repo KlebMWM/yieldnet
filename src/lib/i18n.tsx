@@ -157,6 +157,13 @@ const dict = {
 
   // vault card
   "vault.chain": { en: "Chain", "zh-TW": "鏈", "zh-CN": "链" },
+  "vault.type.lending": { en: "Lending", "zh-TW": "借貸", "zh-CN": "借贷" },
+  "vault.type.staking": { en: "Staking", "zh-TW": "質押", "zh-CN": "质押" },
+  "vault.type.farming": { en: "Farming", "zh-TW": "耕作", "zh-CN": "耕作" },
+  "vault.type.strategy": { en: "Strategy", "zh-TW": "策略", "zh-CN": "策略" },
+  "vault.type.lp": { en: "LP", "zh-TW": "流動性池", "zh-CN": "流动性池" },
+  "explore.allTypes": { en: "All Types", "zh-TW": "所有類型", "zh-CN": "所有类型" },
+  "explore.filterType": { en: "Yield Type", "zh-TW": "收益類型", "zh-CN": "收益类型" },
 
   // calculator
   "calc.title": { en: "Cross-Chain Cost Calculator", "zh-TW": "跨鏈成本計算器", "zh-CN": "跨链成本计算器" },

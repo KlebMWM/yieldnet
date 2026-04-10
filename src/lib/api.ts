@@ -1,3 +1,5 @@
+export type YieldType = "lending" | "staking" | "farming" | "strategy" | "lp";
+
 export interface Vault {
   address: string;
   chainId: number;
@@ -11,6 +13,8 @@ export interface Vault {
   tokenSymbol: string;
   tokenAddress: string;
   tokenDecimals: number;
+  yieldType: YieldType;
+  hasReward: boolean;
 }
 
 interface EarnApiVault {
@@ -25,7 +29,23 @@ interface EarnApiVault {
     apy7d?: number;
     apy30d?: number;
   };
+  tags?: string[];
   [key: string]: unknown;
+}
+
+/** Classify vault into a yield type based on protocol and data */
+function classifyYieldType(proto: string, tags: string[], tokenCount: number, hasReward: boolean): YieldType {
+  const p = proto.toLowerCase();
+  // Staking protocols
+  if (p.includes("ether.fi") || p.includes("etherfi") || p.includes("kelp") || p.includes("kinetiq") || p.includes("lido")) return "staking";
+  // Strategy / aggregator protocols
+  if (p.includes("pendle") || p.includes("yearn") || p.includes("beefy") || p.includes("convex")) return "strategy";
+  // LP / multi-token
+  if (tokenCount > 1 || tags.includes("multi") || tags.includes("il-risk")) return "lp";
+  // Has extra reward tokens → farming
+  if (hasReward) return "farming";
+  // Default: lending (aave, morpho, euler, spark, fluid, etc.)
+  return "lending";
 }
 
 export async function fetchVaults(): Promise<Vault[]> {
@@ -41,20 +61,29 @@ export async function fetchVaults(): Promise<Vault[]> {
     : json.data ?? json.vaults ?? [];
 
   return rawVaults
-    .map((v) => ({
-      address: v.address ?? "",
-      chainId: v.chainId ?? 0,
-      protocol: v.protocol?.name ?? v.protocol?.key ?? "Unknown",
-      protocolUrl: (v.protocol?.url as string) ?? "",
-      name: v.name ?? "Unknown Vault",
-      apy: v.analytics?.apy?.total ?? 0,
-      apy7d: v.analytics?.apy7d ?? 0,
-      apy30d: v.analytics?.apy30d ?? 0,
-      tvl: Number(v.analytics?.tvl?.usd ?? 0),
-      tokenSymbol: v.underlyingTokens?.[0]?.symbol ?? "???",
-      tokenAddress: v.underlyingTokens?.[0]?.address ?? "",
-      tokenDecimals: v.underlyingTokens?.[0]?.decimals ?? 18,
-    }))
+    .map((v) => {
+      const tags = v.tags ?? [];
+      const reward = v.analytics?.apy?.reward;
+      const hasReward = typeof reward === "number" && reward > 0;
+      const tokenCount = v.underlyingTokens?.length ?? 1;
+      const proto = v.protocol?.name ?? v.protocol?.key ?? "Unknown";
+      return {
+        address: v.address ?? "",
+        chainId: v.chainId ?? 0,
+        protocol: proto,
+        protocolUrl: (v.protocol?.url as string) ?? "",
+        name: v.name ?? "Unknown Vault",
+        apy: v.analytics?.apy?.total ?? 0,
+        apy7d: v.analytics?.apy7d ?? 0,
+        apy30d: v.analytics?.apy30d ?? 0,
+        tvl: Number(v.analytics?.tvl?.usd ?? 0),
+        tokenSymbol: v.underlyingTokens?.[0]?.symbol ?? "???",
+        tokenAddress: v.underlyingTokens?.[0]?.address ?? "",
+        tokenDecimals: v.underlyingTokens?.[0]?.decimals ?? 18,
+        yieldType: classifyYieldType(proto, tags as string[], tokenCount, hasReward),
+        hasReward,
+      };
+    })
     .filter((v) => v.address && v.chainId);
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { fetchVaults, Vault } from "@/lib/api";
+import { fetchVaults, Vault, YieldType } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import VaultCard from "@/components/VaultCard";
 import { Search, ArrowUpDown } from "lucide-react";
@@ -21,6 +21,7 @@ export default function ExplorePage() {
   const [protocolFilter, setProtocolFilter] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("apy");
   const [sortDesc, setSortDesc] = useState(true);
+  const [typeFilter, setTypeFilter] = useState<YieldType | null>(null);
 
   useEffect(() => {
     fetchVaults()
@@ -39,6 +40,7 @@ export default function ExplorePage() {
     }
     if (chainFilter !== null) result = result.filter((v) => v.chainId === chainFilter);
     if (protocolFilter) result = result.filter((v) => v.protocol === protocolFilter);
+    if (typeFilter) result = result.filter((v) => v.yieldType === typeFilter);
     result.sort((a, b) => {
       const mul = sortDesc ? -1 : 1;
       if (sortKey === "apy") return mul * (a.apy - b.apy);
@@ -46,7 +48,7 @@ export default function ExplorePage() {
       return mul * a.name.localeCompare(b.name);
     });
     return result;
-  }, [vaults, search, chainFilter, protocolFilter, sortKey, sortDesc]);
+  }, [vaults, search, chainFilter, protocolFilter, typeFilter, sortKey, sortDesc]);
 
   function handleSelectVault(vault: Vault) {
     const apy = vault.apy > 1 ? vault.apy : vault.apy * 100;
@@ -109,7 +111,7 @@ export default function ExplorePage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:flex md:gap-3">
+        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:gap-3">
           <select value={chainFilter ?? ""} onChange={(e) => setChainFilter(e.target.value ? Number(e.target.value) : null)}
             className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
             <option value="">{t("explore.allChains")}</option>
@@ -120,6 +122,16 @@ export default function ExplorePage() {
             className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
             <option value="">{t("explore.allProtocols")}</option>
             {protocols.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+
+          <select value={typeFilter ?? ""} onChange={(e) => setTypeFilter((e.target.value || null) as YieldType | null)}
+            className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
+            <option value="">{t("explore.allTypes")}</option>
+            <option value="lending">{t("vault.type.lending")}</option>
+            <option value="staking">{t("vault.type.staking")}</option>
+            <option value="farming">{t("vault.type.farming")}</option>
+            <option value="strategy">{t("vault.type.strategy")}</option>
+            <option value="lp">{t("vault.type.lp")}</option>
           </select>
 
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}
