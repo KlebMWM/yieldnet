@@ -1,0 +1,52 @@
+"use client";
+
+import { createContext, useContext, useCallback, useEffect, useState } from "react";
+
+type Theme = "dark" | "light";
+
+const ThemeContext = createContext<{
+  theme: Theme;
+  toggle: () => void;
+}>({ theme: "dark", toggle: () => {} });
+
+export function useTheme() {
+  return useContext(ThemeContext);
+}
+
+function applyTheme(t: Theme) {
+  if (t === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as Theme | null;
+    const initial =
+      saved ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+    setTheme(initial);
+    applyTheme(initial);
+  }, []);
+
+  const toggle = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem("theme", next);
+      return next;
+    });
+  }, []);
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggle }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
