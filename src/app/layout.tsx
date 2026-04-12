@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "YieldNet — 跨鏈收益淨值計算器",
+  title: "YieldNet — Cross-Chain Yield Net Value Calculator",
   description:
-    "計算 DeFi 跨鏈收益扣除摩擦成本後的真實報酬。Powered by LI.FI.",
+    "Calculate your real DeFi yield after gas, bridge fees, and slippage. Powered by LI.FI.",
 };
 
 export default function RootLayout({

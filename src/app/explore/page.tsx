@@ -4,11 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import { fetchVaults, Vault, YieldType } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import VaultCard from "@/components/VaultCard";
-import { Search, ArrowUpDown, AlertTriangle } from "lucide-react";
+import { Search, ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
-import { formatAPY } from "@/lib/api";
-import TokenIcon from "@/components/TokenIcon";
+import APYWarningModal from "@/components/APYWarningModal";
 
 type SortKey = "apy" | "tvl" | "name";
 
@@ -33,6 +32,7 @@ export default function ExplorePage() {
   const [sortDesc, setSortDesc] = useState(true);
   const [typeFilter, setTypeFilter] = useState<YieldType | null>(null);
   const [pendingVault, setPendingVault] = useState<Vault | null>(null);
+  const [visibleCount, setVisibleCount] = useState(60);
 
   useEffect(() => {
     fetchVaults()
@@ -102,8 +102,6 @@ export default function ExplorePage() {
     );
   }
 
-  const warnChain = pendingVault ? getChainInfo(pendingVault.chainId) : null;
-
   return (
     <>
       <div className="mx-auto max-w-7xl px-5 py-6 animate-fade-in md:py-8">
@@ -168,57 +166,32 @@ export default function ExplorePage() {
           <div className="py-20 text-center text-base text-muted">{t("explore.empty")}</div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.slice(0, 60).map((vault) => (
+            {filtered.slice(0, visibleCount).map((vault) => (
               <VaultCard key={`${vault.chainId}-${vault.address}`} vault={vault} onSelect={setPendingVault} />
             ))}
           </div>
         )}
 
-        {filtered.length > 60 && (
-          <p className="mt-6 text-center text-sm text-muted">{t("explore.showing", { total: String(filtered.length) })}</p>
+        {filtered.length > visibleCount && (
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-sm text-muted">
+              {t("explore.showing", { shown: String(visibleCount), total: String(filtered.length) })}
+            </p>
+            <button
+              onClick={() => setVisibleCount((c) => c + 60)}
+              className="rounded-2xl border border-border bg-card px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
+            >
+              {t("explore.loadMore")} — {t("explore.remaining", { count: String(filtered.length - visibleCount) })}
+            </button>
+          </div>
         )}
       </div>
 
-      {/* APY Warning Modal — outside animate-fade-in to avoid transform stacking context */}
-      {pendingVault && warnChain && (
-        <div
-          onClick={(e) => { if (e.target === e.currentTarget) setPendingVault(null); }}
-          style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", padding: "1rem" }}
-        >
-          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow/10">
-                <AlertTriangle size={22} className="text-yellow" />
-              </div>
-              <h2 className="text-lg font-bold text-foreground">{t("warn.title")}</h2>
-            </div>
-            <div className="rounded-xl bg-background p-4 mb-4">
-              <div className="flex items-center gap-3">
-                <TokenIcon symbol={pendingVault.tokenSymbol} size={32} />
-                <div className="min-w-0">
-                  <p className="text-base font-semibold text-foreground truncate">{pendingVault.name}</p>
-                  <p className="text-sm text-muted">
-                    <span className="inline-block h-2 w-2 rounded-full mr-1" style={{ backgroundColor: warnChain.color }} />
-                    {warnChain.shortName} · {pendingVault.protocol}
-                  </p>
-                </div>
-                <span className="ml-auto data-mono text-lg font-bold text-accent shrink-0">{formatAPY(pendingVault.apy)}</span>
-              </div>
-            </div>
-            <p className="text-sm text-muted leading-relaxed mb-6">{t("warn.body")}</p>
-            <div className="flex gap-3">
-              <button onClick={() => setPendingVault(null)}
-                className="flex-1 rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition-colors hover:text-foreground hover:border-foreground/20">
-                {t("warn.cancel")}
-              </button>
-              <button onClick={() => { const v = pendingVault; setPendingVault(null); navigateToDeposit(v); }}
-                className="flex-1 rounded-xl bg-accent px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90">
-                {t("warn.continue")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <APYWarningModal
+        vault={pendingVault}
+        onConfirm={(v) => { setPendingVault(null); navigateToDeposit(v); }}
+        onCancel={() => setPendingVault(null)}
+      />
     </>
   );
 }

@@ -5,9 +5,10 @@ import { fetchVaults, Vault, YieldType, formatAPY } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import { useI18n } from "@/lib/i18n";
 import { useRouter } from "next/navigation";
-import { ArrowRight, TrendingUp, Flame, AlertTriangle } from "lucide-react";
+import { ArrowRight, TrendingUp, Flame } from "lucide-react";
 import Link from "next/link";
 import TokenIcon from "./TokenIcon";
+import APYWarningModal from "./APYWarningModal";
 
 const YIELD_TYPE_COLORS: Record<YieldType, string> = {
   lending: "bg-accent/10 text-accent",
@@ -147,49 +148,11 @@ export default function TopYields() {
         })}
       </div>
 
-      {/* APY Warning Modal — inline to avoid transform stacking issues */}
-      {pendingVault && (() => {
-        const wc = getChainInfo(pendingVault.chainId);
-        return (
-          <div
-            onClick={(e) => { if (e.target === e.currentTarget) setPendingVault(null); }}
-            style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", padding: "1rem" }}
-          >
-            <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow/10">
-                  <AlertTriangle size={22} className="text-yellow" />
-                </div>
-                <h2 className="text-lg font-bold text-foreground">{t("warn.title")}</h2>
-              </div>
-              <div className="rounded-xl bg-background p-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <TokenIcon symbol={pendingVault.tokenSymbol} size={32} />
-                  <div className="min-w-0">
-                    <p className="text-base font-semibold text-foreground truncate">{pendingVault.name}</p>
-                    <p className="text-sm text-muted">
-                      <span className="inline-block h-2 w-2 rounded-full mr-1" style={{ backgroundColor: wc.color }} />
-                      {wc.shortName} · {pendingVault.protocol}
-                    </p>
-                  </div>
-                  <span className="ml-auto data-mono text-lg font-bold text-accent shrink-0">{formatAPY(pendingVault.apy)}</span>
-                </div>
-              </div>
-              <p className="text-sm text-muted leading-relaxed mb-6">{t("warn.body")}</p>
-              <div className="flex gap-3">
-                <button onClick={() => setPendingVault(null)}
-                  className="flex-1 rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition-colors hover:text-foreground hover:border-foreground/20">
-                  {t("warn.cancel")}
-                </button>
-                <button onClick={() => { const v = pendingVault; setPendingVault(null); navigateToDeposit(v); }}
-                  className="flex-1 rounded-xl bg-accent px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90">
-                  {t("warn.continue")}
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      <APYWarningModal
+        vault={pendingVault}
+        onConfirm={(v) => { setPendingVault(null); navigateToDeposit(v); }}
+        onCancel={() => setPendingVault(null)}
+      />
     </div>
   );
 }

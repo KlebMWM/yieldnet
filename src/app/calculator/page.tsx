@@ -105,10 +105,7 @@ function CalculatorContent() {
         bridgeTimeMin: 0,
       };
     }
-    const cost = estimateFrictionCost(sourceChain.avgGasCostUSD, destChain.avgGasCostUSD, sourceChain.avgBridgeCostUSD, destChain.avgBridgeCostUSD, sourceChain.avgBridgeTimeMin, destChain.avgBridgeTimeMin, amountUSD, slippageBps);
-    cost.sourceChain = sourceChain.name;
-    cost.destChain = destChain.name;
-    return cost;
+    return estimateFrictionCost(sourceChain.avgGasCostUSD, destChain.avgGasCostUSD, sourceChain.avgBridgeCostUSD, destChain.avgBridgeCostUSD, sourceChain.avgBridgeTimeMin, destChain.avgBridgeTimeMin, amountUSD, slippageBps, sourceChain.name, destChain.name);
   }, [sourceChainId, destChainId, amountUSD, slippageBps, sourceChain, destChain, liveQuote]);
 
   const roundTripCost = friction.totalCostUSD * 2;

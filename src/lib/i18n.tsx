@@ -150,9 +150,15 @@ const dict = {
   "explore.retry": { en: "Retry", "zh-TW": "重試", "zh-CN": "重试" },
   "explore.empty": { en: "No yield pools found matching your filters.", "zh-TW": "找不到符合條件的收益池。", "zh-CN": "找不到符合条件的收益池。" },
   "explore.showing": {
-    en: "Showing 60 of {total} pools. Use filters to narrow results.",
-    "zh-TW": "顯示 60 / {total} 個收益池，請使用篩選縮小範圍。",
-    "zh-CN": "显示 60 / {total} 个收益池，请使用筛选缩小范围。",
+    en: "Showing {shown} of {total} pools.",
+    "zh-TW": "顯示 {shown} / {total} 個收益池。",
+    "zh-CN": "显示 {shown} / {total} 个收益池。",
+  },
+  "explore.loadMore": { en: "Load More", "zh-TW": "載入更多", "zh-CN": "加载更多" },
+  "explore.remaining": {
+    en: "{count} more pools",
+    "zh-TW": "還有 {count} 個收益池",
+    "zh-CN": "还有 {count} 个收益池",
   },
 
   // vault card

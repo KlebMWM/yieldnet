@@ -50,43 +50,60 @@ function classifyYieldType(proto: string, tags: string[], tokenCount: number, ha
   return "lending";
 }
 
+function mapRawVault(v: EarnApiVault): Vault {
+  const tags = v.tags ?? [];
+  const reward = v.analytics?.apy?.reward;
+  const hasReward = typeof reward === "number" && reward > 0;
+  const tokenCount = v.underlyingTokens?.length ?? 1;
+  const proto = v.protocol?.name ?? v.protocol?.key ?? "Unknown";
+  return {
+    address: v.address ?? "",
+    chainId: v.chainId ?? 0,
+    protocol: proto,
+    protocolUrl: (v.protocol?.url as string) ?? "",
+    name: v.name ?? "Unknown Vault",
+    apy: v.analytics?.apy?.total ?? 0,
+    apy7d: v.analytics?.apy7d ?? 0,
+    apy30d: v.analytics?.apy30d ?? 0,
+    tvl: Number(v.analytics?.tvl?.usd ?? 0),
+    tokenSymbol: v.underlyingTokens?.[0]?.symbol ?? "???",
+    tokenAddress: v.underlyingTokens?.[0]?.address ?? "",
+    tokenDecimals: v.underlyingTokens?.[0]?.decimals ?? 18,
+    yieldType: classifyYieldType(proto, tags as string[], tokenCount, hasReward, v.underlyingTokens?.[0]?.symbol ?? ""),
+    hasReward,
+  };
+}
+
 export async function fetchVaults(): Promise<Vault[]> {
-  const res = await fetch("/api/earn/vaults");
-  if (!res.ok) {
-    throw new Error(`Failed to fetch vaults: ${res.status}`);
-  }
+  const allVaults: Vault[] = [];
+  let cursor: string | undefined;
 
-  const json = await res.json();
+  const MAX_PAGES = 20;
+  let page = 0;
 
-  const rawVaults: EarnApiVault[] = Array.isArray(json)
-    ? json
-    : json.data ?? json.vaults ?? [];
+  do {
+    const url = cursor
+      ? `/api/earn/vaults?cursor=${encodeURIComponent(cursor)}`
+      : "/api/earn/vaults";
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch vaults: ${res.status}`);
+    }
 
-  return rawVaults
-    .map((v) => {
-      const tags = v.tags ?? [];
-      const reward = v.analytics?.apy?.reward;
-      const hasReward = typeof reward === "number" && reward > 0;
-      const tokenCount = v.underlyingTokens?.length ?? 1;
-      const proto = v.protocol?.name ?? v.protocol?.key ?? "Unknown";
-      return {
-        address: v.address ?? "",
-        chainId: v.chainId ?? 0,
-        protocol: proto,
-        protocolUrl: (v.protocol?.url as string) ?? "",
-        name: v.name ?? "Unknown Vault",
-        apy: v.analytics?.apy?.total ?? 0,
-        apy7d: v.analytics?.apy7d ?? 0,
-        apy30d: v.analytics?.apy30d ?? 0,
-        tvl: Number(v.analytics?.tvl?.usd ?? 0),
-        tokenSymbol: v.underlyingTokens?.[0]?.symbol ?? "???",
-        tokenAddress: v.underlyingTokens?.[0]?.address ?? "",
-        tokenDecimals: v.underlyingTokens?.[0]?.decimals ?? 18,
-        yieldType: classifyYieldType(proto, tags as string[], tokenCount, hasReward, v.underlyingTokens?.[0]?.symbol ?? ""),
-        hasReward,
-      };
-    })
-    .filter((v) => v.address && v.chainId);
+    const json = await res.json();
+
+    const rawVaults: EarnApiVault[] = Array.isArray(json)
+      ? json
+      : json.data ?? json.vaults ?? [];
+
+    const mapped = rawVaults.map(mapRawVault).filter((v) => v.address && v.chainId);
+    allVaults.push(...mapped);
+
+    cursor = Array.isArray(json) ? undefined : json.nextCursor;
+    page++;
+  } while (cursor && page < MAX_PAGES);
+
+  return allVaults;
 }
 
 export interface FrictionCost {
@@ -107,7 +124,9 @@ export function estimateFrictionCost(
   sourceBridgeTime: number,
   destBridgeTime: number,
   amount: number,
-  slippageBps: number = 30
+  slippageBps: number = 30,
+  sourceChainName: string = "",
+  destChainName: string = "",
 ): FrictionCost {
   const gasCostUSD = sourceChainGas + destChainGas;
   const bridgeFeeUSD = (sourceBridgeCost + destBridgeCost) / 2;
@@ -116,8 +135,8 @@ export function estimateFrictionCost(
   const bridgeTimeMin = Math.max(sourceBridgeTime, destBridgeTime);
 
   return {
-    sourceChain: "",
-    destChain: "",
+    sourceChain: sourceChainName,
+    destChain: destChainName,
     gasCostUSD,
     bridgeFeeUSD,
     slippageCostUSD,
@@ -144,8 +163,8 @@ export async function fetchRealQuote(
       toChain: String(toChainId),
       fromToken,
       toToken,
-      fromAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-      toAddress: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+      fromAddress: "0x0000000000000000000000000000000000000001",
+      toAddress: "0x0000000000000000000000000000000000000001",
       fromAmount: fromAmountSmallest,
     });
     const res = await fetch(`/api/quote?${params.toString()}`);

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Quote fetch failed" }, { status: 502 });
   }
 }
