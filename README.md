@@ -139,6 +139,10 @@ The Earn API is simple and effective — no auth needed, clean response format. 
 - **Add `tags` variety** — currently only `single` and `stablecoin` exist, more granular tags would help filtering
 - **Expose historical APY data points** — `apy7d` and `apy30d` are great, daily granularity would enable trend charts
 
+## Author
+
+Built by **Megan Feng** — [X @Klebmegan](https://x.com/Klebmegan) · [GitHub](https://github.com/KlebMWM)
+
 ## License
 
 MIT
