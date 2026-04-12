@@ -141,7 +141,7 @@ The Earn API is simple and effective — no auth needed, clean response format. 
 
 ## Author
 
-Built by **Megan Feng** — [X @Klebmegan](https://x.com/Klebmegan) · [GitHub](https://github.com/KlebMWM)
+Built by **Megan Feng** — [X @klebsiellamegan](https://x.com/klebsiellamegan) · [GitHub](https://github.com/KlebMWM)
 
 ## License
 
