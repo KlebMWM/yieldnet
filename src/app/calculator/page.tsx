@@ -254,6 +254,18 @@ function CalculatorContent() {
               : t("calc.unprofitable", { days: String(holdingDays), amount: fmt(Math.abs(yieldCalc.netYield)) })
             }
           </div>
+
+          {/* One-click execute — Coming Soon */}
+          <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-foreground">{t("calc.oneClick")}</h2>
+              <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">{t("calc.comingSoon")}</span>
+            </div>
+            <p className="text-sm text-muted mb-4">{t("calc.oneClick.desc")}</p>
+            <button disabled className="flex items-center justify-center gap-2 rounded-2xl bg-muted/20 px-4 py-3.5 text-base font-medium text-muted w-full cursor-not-allowed">
+              <Zap size={18} /> {t("calc.oneClick.btn")}
+            </button>
+          </div>
         </div>
       </div>
     </div>

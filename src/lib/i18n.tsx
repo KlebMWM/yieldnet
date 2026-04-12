@@ -23,25 +23,25 @@ const dict = {
 
   // home hero
   "home.badge": { en: "DeFi Mullet Hackathon #1", "zh-TW": "DeFi Mullet Hackathon #1", "zh-CN": "DeFi Mullet Hackathon #1" },
-  "home.title.prefix": { en: "Know Your", "zh-TW": "看見你的", "zh-CN": "看见你的" },
-  "home.title.highlight": { en: "True Yield", "zh-TW": "真實收益", "zh-CN": "真实收益" },
+  "home.title.prefix": { en: "Don't Lose Money on ", "zh-TW": "別再讓跨鏈手續費吃掉你的", "zh-CN": "别再让跨链手续费吃掉你的" },
+  "home.title.highlight": { en: "Cross-Chain Yield", "zh-TW": "收益", "zh-CN": "收益" },
   "home.subtitle1": {
-    en: "DeFi offers lending, liquidity pools, yield farming, staking, and more — spread across dozens of chains",
-    "zh-TW": "DeFi 世界有借貸、流動性池、收益耕作、質押等各種收益機會，分佈在數十條鏈上",
-    "zh-CN": "DeFi 世界有借贷、流动性池、收益耕作、质押等各种收益机会，分布在数十条链上",
+    en: "That 15% APY on another chain? After gas, bridge fees, and slippage, you might actually lose money",
+    "zh-TW": "另一條鏈上的 15% APY？扣掉 Gas、跨鏈手續費和滑點，你可能根本是在虧錢",
+    "zh-CN": "另一条链上的 15% APY？扣掉 Gas、跨链手续费和滑点，你可能根本是在亏钱",
   },
   "home.subtitle2": {
-    en: "But transferring assets cross-chain costs gas, fees, and slippage",
-    "zh-TW": "但將資產轉移到其他鏈上，需要支付 Gas、手續費和滑點",
-    "zh-CN": "但将资产转移到其他链上，需要支付 Gas、手续费和滑点",
+    en: "YieldNet calculates the real net return before you move a single dollar",
+    "zh-TW": "YieldNet 在你動用任何一塊錢之前，先幫你算出真正的淨收益",
+    "zh-CN": "YieldNet 在你动用任何一块钱之前，先帮你算出真正的净收益",
   },
   "home.subtitle3": {
-    en: "YieldNet shows you the real return after all those hidden costs",
-    "zh-TW": "YieldNet 幫你算出扣除這些隱藏成本後的實際收益",
-    "zh-CN": "YieldNet 帮你算出扣除这些隐藏成本后的实际收益",
+    en: "Stop guessing. Start knowing.",
+    "zh-TW": "別再憑感覺，用數字說話",
+    "zh-CN": "别再凭感觉，用数字说话",
   },
-  "home.cta.explore": { en: "Start Exploring", "zh-TW": "開始探索", "zh-CN": "开始探索" },
-  "home.cta.calc": { en: "Calculate Costs", "zh-TW": "計算成本", "zh-CN": "计算成本" },
+  "home.cta.explore": { en: "Check Before You Move", "zh-TW": "轉帳前先檢查", "zh-CN": "转账前先检查" },
+  "home.cta.calc": { en: "Calculate Net Yield", "zh-TW": "計算淨收益", "zh-CN": "计算净收益" },
 
   // home explainer — yield types
   "home.yield.title": { en: "Yield Types YieldNet Covers", "zh-TW": "YieldNet 涵蓋的收益類型", "zh-CN": "YieldNet 涵盖的收益类型" },
@@ -77,17 +77,17 @@ const dict = {
   },
 
   // home problem/solution
-  "home.problem.title": { en: "The Hidden Cost Problem", "zh-TW": "隱藏成本的陷阱", "zh-CN": "隐藏成本的陷阱" },
+  "home.problem.title": { en: "You Might Be Losing Money Right Now", "zh-TW": "你現在可能正在虧錢", "zh-CN": "你现在可能正在亏钱" },
   "home.problem.desc": {
-    en: "You see a pool offering 15% APY on another chain. Looks great! But to get there, you pay gas + cross-chain fees + slippage. And when you want to leave, you pay again. After all that, your real return might only be 3% — or even negative.",
-    "zh-TW": "你看到另一條鏈上有個 15% APY 的收益池，看起來很棒！但把資產轉過去要付 Gas + 跨鏈手續費 + 滑點，想離開時又要再付一次。扣完這些，你的實際報酬可能只剩 3%——甚至是虧損。",
-    "zh-CN": "你看到另一条链上有个 15% APY 的收益池，看起来很棒！但把资产转过去要付 Gas + 跨链手续费 + 滑点，想离开时又要再付一次。扣完这些，你的实际报酬可能只剩 3%——甚至是亏损。",
+    en: "A $1,000 deposit at 8% APY earns $0.22/day. But a single cross-chain round trip can cost $10+. That means you need 45+ days just to break even — and most people don't stay that long.",
+    "zh-TW": "存 $1,000 在 8% APY 的池子，每天只賺 $0.22。但一次跨鏈來回就要花 $10 以上。這代表你要存 45 天以上才能回本——而大多數人根本撐不到那時候",
+    "zh-CN": "存 $1,000 在 8% APY 的池子，每天只赚 $0.22。但一次跨链来回就要花 $10 以上。这代表你要存 45 天以上才能回本——而大多数人根本撑不到那时候",
   },
-  "home.solution.title": { en: "YieldNet Shows the Real Numbers", "zh-TW": "YieldNet 算給你看", "zh-CN": "YieldNet 算给你看" },
+  "home.solution.title": { en: "Know Before You Move", "zh-TW": "轉帳前，先算清楚", "zh-CN": "转账前，先算清楚" },
   "home.solution.desc": {
-    en: "We calculate the true yield after ALL cross-chain costs. See your break-even point, net APY, and whether that yield is actually worth chasing.",
-    "zh-TW": "我們幫你算出扣除所有跨鏈成本後的真實收益。看到損益兩平天數、實得 APY，判斷這個收益到底值不值得投入",
-    "zh-CN": "我们帮你算出扣除所有跨链成本后的真实收益。看到损益平衡天数、实得 APY，判断这个收益到底值不值得投入",
+    en: "YieldNet tells you exactly how many days to break even, your real net APY, and whether the yield is worth it — before you spend a single dollar on gas.",
+    "zh-TW": "YieldNet 在你花任何一毛 Gas 之前，就告訴你要存多少天才能回本、實際淨 APY 是多少、這筆投入到底值不值得",
+    "zh-CN": "YieldNet 在你花任何一毛 Gas 之前，就告诉你要存多少天才能回本、实际净 APY 是多少、这笔投入到底值不值得",
   },
 
   // home features
@@ -197,6 +197,14 @@ const dict = {
   "calc.breakeven": { en: "Break-even", "zh-TW": "損益兩平", "zh-CN": "损益平衡" },
   "calc.never": { en: "Never", "zh-TW": "永不", "zh-CN": "永不" },
   "calc.viewDashboard": { en: "View Detailed Charts", "zh-TW": "查看詳細圖表分析", "zh-CN": "查看详细图表分析" },
+  "calc.oneClick": { en: "One-Click Execute", "zh-TW": "一鍵執行", "zh-CN": "一键执行" },
+  "calc.comingSoon": { en: "Coming Soon", "zh-TW": "即將推出", "zh-CN": "即将推出" },
+  "calc.oneClick.desc": {
+    en: "Calculate your net yield, then bridge and deposit in a single transaction via LI.FI — using the cheapest route automatically.",
+    "zh-TW": "算完淨收益後，一鍵透過 LI.FI 自動選擇最省錢的路徑，完成跨鏈和存款",
+    "zh-CN": "算完净收益后，一键通过 LI.FI 自动选择最省钱的路径，完成跨链和存款",
+  },
+  "calc.oneClick.btn": { en: "Bridge + Deposit in One Click", "zh-TW": "一鍵跨鏈 + 存款", "zh-CN": "一键跨链 + 存款" },
   "calc.profitable": {
     en: "Profitable after {days} days. Over {holding} days you'd earn {amount} after all fees.",
     "zh-TW": "約 {days} 天後開始獲利。持有 {holding} 天，扣除所有費用後可賺 {amount}。",
