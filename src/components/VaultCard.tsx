@@ -1,6 +1,6 @@
 "use client";
 
-import { Vault, YieldType } from "@/lib/api";
+import { Vault, YieldType, formatAPY, getAPYColor } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import { useI18n } from "@/lib/i18n";
 import TokenIcon from "./TokenIcon";
@@ -28,17 +28,6 @@ function formatNumber(n: number): string {
   return `$${n.toFixed(2)}`;
 }
 
-function fmtAPY(apy: number): string {
-  const pct = apy > 1 ? apy : apy * 100;
-  return `${pct.toFixed(2)}%`;
-}
-
-function getAPYColor(apy: number): string {
-  const pct = apy > 1 ? apy : apy * 100;
-  if (pct >= 20) return "text-green";
-  if (pct >= 10) return "text-yellow";
-  return "text-accent";
-}
 
 interface VaultCardProps {
   vault: Vault;
@@ -63,7 +52,7 @@ export default function VaultCard({ vault, onSelect }: VaultCardProps) {
             {t(YIELD_TYPE_KEYS[vault.yieldType])}
           </span>
         </div>
-        <span className={`data-mono text-xl font-bold ${getAPYColor(vault.apy)}`}>{fmtAPY(vault.apy)}</span>
+        <span className={`data-mono text-xl font-bold ${getAPYColor(vault.apy)}`}>{formatAPY(vault.apy)}</span>
       </div>
 
       <div className="flex items-center gap-3">
@@ -79,12 +68,12 @@ export default function VaultCard({ vault, onSelect }: VaultCardProps) {
         <div className="flex gap-3 text-xs">
           {vault.apy7d > 0 && (
             <span className="rounded-lg bg-background px-2 py-1 text-muted">
-              {t("apy.7d")} <strong className="text-foreground">{fmtAPY(vault.apy7d)}</strong>
+              {t("apy.7d")} <strong className="text-foreground">{formatAPY(vault.apy7d)}</strong>
             </span>
           )}
           {vault.apy30d > 0 && (
             <span className="rounded-lg bg-background px-2 py-1 text-muted">
-              {t("apy.30d")} <strong className="text-foreground">{fmtAPY(vault.apy30d)}</strong>
+              {t("apy.30d")} <strong className="text-foreground">{formatAPY(vault.apy30d)}</strong>
             </span>
           )}
         </div>

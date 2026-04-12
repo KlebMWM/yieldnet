@@ -135,9 +135,9 @@ const dict = {
   // explore
   "explore.title": { en: "Explore DeFi Yields", "zh-TW": "收益探索", "zh-CN": "收益探索" },
   "explore.sub": {
-    en: "{count} yield pools across {chains} chains. Click to deposit or calculate costs.",
-    "zh-TW": "共 {count} 個收益池，橫跨 {chains} 條鏈。點擊可直接存款或計算成本。",
-    "zh-CN": "共 {count} 个收益池，横跨 {chains} 条链。点击可直接存款或计算成本。",
+    en: "{count} yield pools across {chains} chains. APY data from LI.FI Earn API.",
+    "zh-TW": "共 {count} 個收益池，橫跨 {chains} 條鏈。APY 數據來自 LI.FI Earn API。",
+    "zh-CN": "共 {count} 个收益池，横跨 {chains} 条链。APY 数据来自 LI.FI Earn API。",
   },
   "explore.search": { en: "Search pools, protocols, tokens…", "zh-TW": "搜尋收益池、協議、代幣⋯", "zh-CN": "搜索收益池、协议、代币…" },
   "explore.allChains": { en: "All Chains", "zh-TW": "所有鏈", "zh-CN": "所有链" },
@@ -312,6 +312,21 @@ const dict = {
     "zh-CN": "暂无直接存款链接，请到协议官网搜索此收益池。",
   },
   "dep.poweredBy": { en: "Powered by LI.FI", "zh-TW": "由 LI.FI 提供支持", "zh-CN": "由 LI.FI 提供支持" },
+  "dep.dataSource": {
+    en: "APY data sourced from LI.FI Earn API and may differ from the protocol's own display. Please verify on the protocol page before depositing.",
+    "zh-TW": "APY 數據來自 LI.FI Earn API，可能與協議頁面顯示的數值不同。存入前請至協議頁面確認。",
+    "zh-CN": "APY 数据来自 LI.FI Earn API，可能与协议页面显示的数值不同。存入前请到协议页面确认。",
+  },
+
+  // APY warning modal
+  "warn.title": { en: "APY Data Notice", "zh-TW": "APY 數據提醒", "zh-CN": "APY 数据提醒" },
+  "warn.body": {
+    en: "The APY shown is sourced from the LI.FI Earn API and may differ from the rate displayed on the protocol's own page. Please verify the actual APY on the protocol page before depositing.",
+    "zh-TW": "此處顯示的 APY 來自 LI.FI Earn API，可能與協議頁面上的實際數值不同。存入前請務必至協議頁面確認實際收益率。",
+    "zh-CN": "此处显示的 APY 来自 LI.FI Earn API，可能与协议页面上的实际数值不同。存入前请务必到协议页面确认实际收益率。",
+  },
+  "warn.continue": { en: "I understand, continue", "zh-TW": "我了解，繼續前往", "zh-CN": "我了解，继续前往" },
+  "warn.cancel": { en: "Cancel", "zh-TW": "取消", "zh-CN": "取消" },
 
   // historical APY
   "apy.current": { en: "Current", "zh-TW": "當前", "zh-CN": "当前" },

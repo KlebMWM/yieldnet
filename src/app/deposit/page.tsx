@@ -130,6 +130,9 @@ function DepositContent() {
             )}
           </div>
         </div>
+        <p className="mt-4 text-xs text-muted leading-relaxed border-t border-border pt-3">
+          {t("dep.dataSource")}
+        </p>
       </div>
 
       {/* Step 1 — Bridge */}

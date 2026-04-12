@@ -176,6 +176,22 @@ export async function fetchRealQuote(
   }
 }
 
+// ── APY display helpers (single source of truth) ──────────────────
+// The Earn API returns APY values already as percentages (e.g. 3.80 = 3.80%).
+// NEVER multiply by 100 — use these helpers everywhere.
+
+/** Format an APY value for display, e.g. 3.7984 → "3.80%" */
+export function formatAPY(apy: number): string {
+  return `${apy.toFixed(2)}%`;
+}
+
+/** Color class based on APY percentage */
+export function getAPYColor(apy: number): string {
+  if (apy >= 20) return "text-green";
+  if (apy >= 10) return "text-yellow";
+  return "text-accent";
+}
+
 export function calculateNetYield(
   depositAmount: number,
   apyPercent: number,

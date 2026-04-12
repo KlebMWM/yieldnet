@@ -4,9 +4,11 @@ import { useEffect, useState, useMemo } from "react";
 import { fetchVaults, Vault, YieldType } from "@/lib/api";
 import { getChainInfo } from "@/lib/chains";
 import VaultCard from "@/components/VaultCard";
-import { Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
+import { formatAPY } from "@/lib/api";
+import TokenIcon from "@/components/TokenIcon";
 
 type SortKey = "apy" | "tvl" | "name";
 
@@ -30,6 +32,7 @@ export default function ExplorePage() {
   const [sortKey, setSortKey] = useState<SortKey>("apy");
   const [sortDesc, setSortDesc] = useState(true);
   const [typeFilter, setTypeFilter] = useState<YieldType | null>(null);
+  const [pendingVault, setPendingVault] = useState<Vault | null>(null);
 
   useEffect(() => {
     fetchVaults()
@@ -63,13 +66,10 @@ export default function ExplorePage() {
     return result;
   }, [vaults, search, chainFilter, protocolFilter, typeFilter, sortKey, sortDesc]);
 
-  function handleSelectVault(vault: Vault) {
-    const apy = vault.apy > 1 ? vault.apy : vault.apy * 100;
-    const apy7d = vault.apy7d > 1 ? vault.apy7d : vault.apy7d * 100;
-    const apy30d = vault.apy30d > 1 ? vault.apy30d : vault.apy30d * 100;
+  function navigateToDeposit(vault: Vault) {
     const params = new URLSearchParams({
-      vault: vault.name, chain: String(vault.chainId), apy: String(apy.toFixed(2)),
-      apy7d: String(apy7d.toFixed(2)), apy30d: String(apy30d.toFixed(2)),
+      vault: vault.name, chain: String(vault.chainId), apy: String(vault.apy.toFixed(2)),
+      apy7d: String(vault.apy7d.toFixed(2)), apy30d: String(vault.apy30d.toFixed(2)),
       protocol: vault.protocol, token: vault.tokenSymbol,
       protocolUrl: vault.protocolUrl, address: vault.address,
     });
@@ -102,78 +102,123 @@ export default function ExplorePage() {
     );
   }
 
+  const warnChain = pendingVault ? getChainInfo(pendingVault.chainId) : null;
+
   return (
-    <div className="mx-auto max-w-7xl px-5 py-6 animate-fade-in md:py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">{t("explore.title")}</h1>
-        <p className="mt-2 text-base text-muted">
-          {t("explore.sub", { count: String(vaults.length), chains: String(chainIds.length) })}
-        </p>
+    <>
+      <div className="mx-auto max-w-7xl px-5 py-6 animate-fade-in md:py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">{t("explore.title")}</h1>
+          <p className="mt-2 text-base text-muted">
+            {t("explore.sub", { count: String(vaults.length), chains: String(chainIds.length) })}
+          </p>
+        </div>
+
+        {/* Filters — stack on mobile */}
+        <div className="mb-6 space-y-3 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-3">
+          <div className="relative flex-1 min-w-0">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="text"
+              placeholder={t("explore.search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-4 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:gap-3">
+            <select value={chainFilter ?? ""} onChange={(e) => setChainFilter(e.target.value ? Number(e.target.value) : null)}
+              className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
+              <option value="">{t("explore.allChains")}</option>
+              {chainIds.map((id) => <option key={id} value={id}>{getChainInfo(id).name}</option>)}
+            </select>
+
+            <select value={protocolFilter ?? ""} onChange={(e) => setProtocolFilter(e.target.value || null)}
+              className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
+              <option value="">{t("explore.allProtocols")}</option>
+              {protocols.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+
+            <select value={typeFilter ?? ""} onChange={(e) => setTypeFilter((e.target.value || null) as YieldType | null)}
+              className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
+              <option value="">{t("explore.allTypes")}</option>
+              {(["lending", "farming", "staking", "strategy", "lp"] as YieldType[])
+                .filter((ty) => (typeCounts[ty] || 0) > 0)
+                .map((ty) => (
+                  <option key={ty} value={ty}>{t(YIELD_TYPE_KEYS[ty])} ({typeCounts[ty]})</option>
+                ))}
+            </select>
+
+            <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}
+              className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
+              <option value="apy">{t("explore.sortApy")}</option>
+              <option value="tvl">{t("explore.sortTvl")}</option>
+              <option value="name">{t("explore.sortName")}</option>
+            </select>
+
+            <button onClick={() => setSortDesc(!sortDesc)}
+              className="rounded-2xl border border-border bg-card p-3 text-muted hover:text-foreground transition-colors flex items-center justify-center">
+              <ArrowUpDown size={18} />
+            </button>
+          </div>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="py-20 text-center text-base text-muted">{t("explore.empty")}</div>
+        ) : (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.slice(0, 60).map((vault) => (
+              <VaultCard key={`${vault.chainId}-${vault.address}`} vault={vault} onSelect={setPendingVault} />
+            ))}
+          </div>
+        )}
+
+        {filtered.length > 60 && (
+          <p className="mt-6 text-center text-sm text-muted">{t("explore.showing", { total: String(filtered.length) })}</p>
+        )}
       </div>
 
-      {/* Filters — stack on mobile */}
-      <div className="mb-6 space-y-3 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-3">
-        <div className="relative flex-1 min-w-0">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="text"
-            placeholder={t("explore.search")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-4 text-base text-foreground placeholder:text-muted focus:border-accent focus:outline-none"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 md:flex md:flex-wrap md:gap-3">
-          <select value={chainFilter ?? ""} onChange={(e) => setChainFilter(e.target.value ? Number(e.target.value) : null)}
-            className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
-            <option value="">{t("explore.allChains")}</option>
-            {chainIds.map((id) => <option key={id} value={id}>{getChainInfo(id).name}</option>)}
-          </select>
-
-          <select value={protocolFilter ?? ""} onChange={(e) => setProtocolFilter(e.target.value || null)}
-            className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
-            <option value="">{t("explore.allProtocols")}</option>
-            {protocols.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-
-          <select value={typeFilter ?? ""} onChange={(e) => setTypeFilter((e.target.value || null) as YieldType | null)}
-            className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
-            <option value="">{t("explore.allTypes")}</option>
-            {(["lending", "farming", "staking", "strategy", "lp"] as YieldType[])
-              .filter((ty) => (typeCounts[ty] || 0) > 0)
-              .map((ty) => (
-                <option key={ty} value={ty}>{t(YIELD_TYPE_KEYS[ty])} ({typeCounts[ty]})</option>
-              ))}
-          </select>
-
-          <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}
-            className="rounded-2xl border border-border bg-card px-4 py-3 text-base text-foreground focus:border-accent focus:outline-none">
-            <option value="apy">{t("explore.sortApy")}</option>
-            <option value="tvl">{t("explore.sortTvl")}</option>
-            <option value="name">{t("explore.sortName")}</option>
-          </select>
-
-          <button onClick={() => setSortDesc(!sortDesc)}
-            className="rounded-2xl border border-border bg-card p-3 text-muted hover:text-foreground transition-colors flex items-center justify-center">
-            <ArrowUpDown size={18} />
-          </button>
-        </div>
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="py-20 text-center text-base text-muted">{t("explore.empty")}</div>
-      ) : (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.slice(0, 60).map((vault) => (
-            <VaultCard key={`${vault.chainId}-${vault.address}`} vault={vault} onSelect={handleSelectVault} />
-          ))}
+      {/* APY Warning Modal — outside animate-fade-in to avoid transform stacking context */}
+      {pendingVault && warnChain && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setPendingVault(null); }}
+          style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", padding: "1rem" }}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow/10">
+                <AlertTriangle size={22} className="text-yellow" />
+              </div>
+              <h2 className="text-lg font-bold text-foreground">{t("warn.title")}</h2>
+            </div>
+            <div className="rounded-xl bg-background p-4 mb-4">
+              <div className="flex items-center gap-3">
+                <TokenIcon symbol={pendingVault.tokenSymbol} size={32} />
+                <div className="min-w-0">
+                  <p className="text-base font-semibold text-foreground truncate">{pendingVault.name}</p>
+                  <p className="text-sm text-muted">
+                    <span className="inline-block h-2 w-2 rounded-full mr-1" style={{ backgroundColor: warnChain.color }} />
+                    {warnChain.shortName} · {pendingVault.protocol}
+                  </p>
+                </div>
+                <span className="ml-auto data-mono text-lg font-bold text-accent shrink-0">{formatAPY(pendingVault.apy)}</span>
+              </div>
+            </div>
+            <p className="text-sm text-muted leading-relaxed mb-6">{t("warn.body")}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setPendingVault(null)}
+                className="flex-1 rounded-xl border border-border px-4 py-3 text-sm font-medium text-muted transition-colors hover:text-foreground hover:border-foreground/20">
+                {t("warn.cancel")}
+              </button>
+              <button onClick={() => { const v = pendingVault; setPendingVault(null); navigateToDeposit(v); }}
+                className="flex-1 rounded-xl bg-accent px-4 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90">
+                {t("warn.continue")}
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      {filtered.length > 60 && (
-        <p className="mt-6 text-center text-sm text-muted">{t("explore.showing", { total: String(filtered.length) })}</p>
-      )}
-    </div>
+    </>
   );
 }
