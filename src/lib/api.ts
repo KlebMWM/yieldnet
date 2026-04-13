@@ -85,7 +85,22 @@ export async function fetchVaults(): Promise<Vault[]> {
     const url = cursor
       ? `/api/earn/vaults?cursor=${encodeURIComponent(cursor)}`
       : "/api/earn/vaults";
-    const res = await fetch(url);
+
+    let res: Response;
+    let retries = 0;
+    const MAX_RETRIES = 3;
+
+    // Retry with exponential backoff on 429 (rate limit)
+    while (true) {
+      res = await fetch(url);
+      if (res.status === 429 && retries < MAX_RETRIES) {
+        retries++;
+        await new Promise((r) => setTimeout(r, 1000 * 2 ** retries));
+        continue;
+      }
+      break;
+    }
+
     if (!res.ok) {
       throw new Error(`Failed to fetch vaults (page ${page}): HTTP ${res.status}`);
     }
@@ -100,6 +115,9 @@ export async function fetchVaults(): Promise<Vault[]> {
 
     cursor = Array.isArray(json) ? undefined : json.nextCursor;
     page++;
+
+    // Small delay between pages to avoid rate limiting
+    if (cursor) await new Promise((r) => setTimeout(r, 200));
   } while (cursor && page < MAX_PAGES);
 
   return allVaults;
