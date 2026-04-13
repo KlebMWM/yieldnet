@@ -30,10 +30,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return new NextResponse(text, {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    });
+    try {
+      const data = JSON.parse(text);
+      return NextResponse.json(data);
+    } catch {
+      return NextResponse.json(
+        { error: "Upstream returned non-JSON response", body: text.slice(0, 300) },
+        { status: 502 },
+      );
+    }
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Quote fetch failed" },

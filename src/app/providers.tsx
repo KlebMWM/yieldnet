@@ -30,7 +30,7 @@ import { I18nProvider, useI18n } from "@/lib/i18n";
 
 const config = getDefaultConfig({
   appName: "YieldNet",
-  projectId: "04cbbf5b5e04e1281de3c0e97d498a77",
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "04cbbf5b5e04e1281de3c0e97d498a77",
   chains: [
     mainnet,
     optimism,
