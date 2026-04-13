@@ -36,8 +36,21 @@ export default function ExplorePage() {
 
   useEffect(() => {
     fetchVaults()
-      .then((data) => { setVaults(data); setLoading(false); })
-      .catch((err) => { setError(err.message); setLoading(false); });
+      .then((data) => {
+        if (data.length === 0) {
+          console.warn("[explore] fetchVaults resolved with empty array");
+          setError("Vaults API returned 0 results. Check console for details.");
+          setLoading(false);
+          return;
+        }
+        setVaults(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("[explore] fetchVaults failed", err);
+        setError(err instanceof Error ? err.message : String(err));
+        setLoading(false);
+      });
   }, []);
 
   const protocols = useMemo(() => Array.from(new Set(vaults.map((v) => v.protocol))).sort(), [vaults]);

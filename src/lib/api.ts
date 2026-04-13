@@ -81,28 +81,59 @@ export async function fetchVaults(): Promise<Vault[]> {
   const MAX_PAGES = 20;
   let page = 0;
 
+  console.log("[fetchVaults] start");
+
   do {
     const url = cursor
       ? `/api/earn/vaults?cursor=${encodeURIComponent(cursor)}`
       : "/api/earn/vaults";
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch vaults: ${res.status}`);
+
+    let res: Response;
+    try {
+      res = await fetch(url);
+    } catch (err) {
+      console.error("[fetchVaults] network error on page", page, err);
+      throw new Error(`Network error fetching vaults (page ${page}): ${err instanceof Error ? err.message : String(err)}`);
     }
 
-    const json = await res.json();
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error("[fetchVaults] non-OK on page", page, res.status, body.slice(0, 200));
+      throw new Error(`Failed to fetch vaults (page ${page}): HTTP ${res.status}`);
+    }
 
+    let json: unknown;
+    try {
+      json = await res.json();
+    } catch (err) {
+      console.error("[fetchVaults] JSON parse failed on page", page, err);
+      throw new Error(`Invalid JSON from vaults API on page ${page}`);
+    }
+
+    if (json == null || typeof json !== "object") {
+      console.error("[fetchVaults] unexpected payload shape on page", page, json);
+      throw new Error(`Unexpected vaults payload on page ${page}`);
+    }
+
+    const payload = json as { data?: unknown; vaults?: unknown; nextCursor?: string; total?: number };
     const rawVaults: EarnApiVault[] = Array.isArray(json)
-      ? json
-      : json.data ?? json.vaults ?? [];
+      ? (json as EarnApiVault[])
+      : (Array.isArray(payload.data) ? payload.data as EarnApiVault[]
+        : Array.isArray(payload.vaults) ? payload.vaults as EarnApiVault[]
+        : []);
 
-    const mapped = rawVaults.map(mapRawVault).filter((v) => v.address && v.chainId);
-    allVaults.push(...mapped);
+    const mapped = rawVaults.map(mapRawVault);
+    const kept = mapped.filter((v) => v.address && v.chainId);
+    console.log(
+      `[fetchVaults] page ${page}: raw=${rawVaults.length} mapped=${mapped.length} kept=${kept.length} nextCursor=${payload.nextCursor ? "yes" : "no"}`,
+    );
+    allVaults.push(...kept);
 
-    cursor = Array.isArray(json) ? undefined : json.nextCursor;
+    cursor = Array.isArray(json) ? undefined : payload.nextCursor;
     page++;
   } while (cursor && page < MAX_PAGES);
 
+  console.log(`[fetchVaults] done: ${allVaults.length} vaults across ${page} pages`);
   return allVaults;
 }
 
