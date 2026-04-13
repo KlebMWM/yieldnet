@@ -20,9 +20,24 @@ export async function GET(req: NextRequest) {
     const res = await fetch(`${COMPOSER_URL}?${qs}`, {
       headers: { "x-lifi-api-key": apiKey },
     });
-    const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
-  } catch {
-    return NextResponse.json({ error: "Quote fetch failed" }, { status: 502 });
+
+    const text = await res.text();
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Upstream quote failed", status: res.status, body: text.slice(0, 300) },
+        { status: 502 },
+      );
+    }
+
+    return new NextResponse(text, {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Quote fetch failed" },
+      { status: 502 },
+    );
   }
 }
