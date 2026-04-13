@@ -243,6 +243,10 @@ function CalculatorContent() {
               className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-3.5 text-base font-medium text-white transition-all hover:opacity-90 w-full">
               <BarChart3 size={18} /> {t("calc.viewDashboard")}
             </Link>
+            <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-muted">
+              <Info size={12} className="mt-0.5 shrink-0" />
+              <span>{t("calc.modelNote")}</span>
+            </p>
           </div>
 
           <div className={`rounded-2xl border px-5 py-4 text-base leading-relaxed ${yieldCalc.netYield >= 0 ? "border-green/20 bg-green/5 text-green" : "border-red/20 bg-red/5 text-red"}`}>

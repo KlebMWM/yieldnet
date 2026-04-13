@@ -32,7 +32,7 @@ YieldNet pulls real vault data and real-time bridge quotes from LI.FI, then show
 
 | Feature | Description |
 |---------|-------------|
-| **Yield Explorer** | Browse 50+ vaults across 10+ chains, filtered by yield type (lending, staking, farming, strategy), chain, and protocol |
+| **Yield Explorer** | Browse 600+ vaults across 20+ chains, filtered by yield type (lending, staking, farming, strategy), chain, and protocol |
 | **Cost Calculator** | Real-time cross-chain cost breakdown with live quotes from LI.FI Composer API |
 | **Net Value Dashboard** | 4 interactive charts: yield over time, break-even crossover, break-even by deposit size, net APY by deposit size |
 | **Deposit Flow** | Guided steps to bridge via Jumper Exchange and deposit into the protocol |
@@ -124,9 +124,20 @@ Real-time cross-chain cost breakdown with live quotes from LI.FI Composer API.
 ### Net Value Dashboard
 Interactive charts showing break-even analysis and net APY by deposit size.
 
+## Known Limitations
+
+YieldNet is a hackathon prototype. A few things to be aware of when reading the numbers:
+
+- **Cost model is round-trip and partly heuristic.** The calculator assumes you bridge in *and* out (`one-way cost × 2`). When LI.FI Composer returns a live quote we use the real gas + bridge fee + observed slippage; otherwise we fall back to per-chain static averages from `src/lib/chains.ts`. Same-chain routes skip the bridge fee entirely.
+- **Non-stablecoin token prices are static reference values.** USD conversion for ETH, WBTC, BNB, and other non-stables uses hardcoded prices in `src/lib/tokens.ts`. Stablecoins (USDC/USDT/DAI/USDe/etc.) are pinned to $1. If you input a non-stable amount, the underlying friction calculation (`amount × slippage_bps`) will be off by however much the static price drifts from spot. Stablecoin and USD-denominated inputs are accurate.
+- **APY values come straight from the LI.FI Earn API.** Some vaults occasionally show stale or divergent APYs vs. the protocol's own page — the explorer surfaces a warning modal before navigating to deposit. We don't second-guess the API.
+- **`yieldType` is client-side classified** from protocol name, token symbol, and tags — not an official Earn API field.
+- **Wallet is connected via RainbowKit but not yet used in the calculation.** Source chain is selected manually.
+
 ## What's Next
 
 - Wallet-aware source chain detection
+- Live token price feed (replace static `tokens.ts` references)
 - Historical APY trend charts
 - Portfolio tracking across multiple positions
 - Direct deposit execution via LI.FI SDK

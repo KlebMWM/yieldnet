@@ -221,6 +221,11 @@ const dict = {
     "zh-TW": "持有 {days} 天會虧損 {amount}。建議延長持有天數，或選擇同鏈上的收益池。",
     "zh-CN": "持有 {days} 天会亏损 {amount}。建议延长持有天数，或选择同链上的收益池。",
   },
+  "calc.modelNote": {
+    en: "Cost model: assumes you bridge in and back out (round-trip = one-way × 2). Live LI.FI Composer quote when chains differ; otherwise per-chain static averages. Non-stable token amounts use static reference prices.",
+    "zh-TW": "成本模型：假設你會跨鏈進、再跨鏈出（來回 = 單次 × 2）。跨鏈時優先使用 LI.FI Composer 即時報價，否則使用各鏈靜態平均值。非穩定幣金額採用靜態參考價格換算。",
+    "zh-CN": "成本模型：假设你会跨链进、再跨链出（来回 = 单次 × 2）。跨链时优先使用 LI.FI Composer 实时报价，否则使用各链静态平均值。非稳定币金额采用静态参考价格换算。",
+  },
 
   // dashboard
   "dash.back": { en: "Back to Calculator", "zh-TW": "返回計算器", "zh-CN": "返回计算器" },

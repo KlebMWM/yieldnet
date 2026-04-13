@@ -57,7 +57,9 @@ export default function ExplorePage() {
     if (chainFilter !== null) result = result.filter((v) => v.chainId === chainFilter);
     if (protocolFilter) result = result.filter((v) => v.protocol === protocolFilter);
     if (typeFilter) result = result.filter((v) => v.yieldType === typeFilter);
-    result.sort((a, b) => {
+    // Clone before sort — sort() mutates in place, and `result` may still
+    // point to the `vaults` state array if no filters were applied.
+    result = [...result].sort((a, b) => {
       const mul = sortDesc ? -1 : 1;
       if (sortKey === "apy") return mul * (a.apy - b.apy);
       if (sortKey === "tvl") return mul * (a.tvl - b.tvl);
