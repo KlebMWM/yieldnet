@@ -188,6 +188,7 @@ const dict = {
   "calc.quoting": { en: "Fetching live quote…", "zh-TW": "正在取得即時報價⋯", "zh-CN": "正在获取实时报价…" },
   "calc.liveQuote": { en: "Live Quote", "zh-TW": "即時報價", "zh-CN": "实时报价" },
   "calc.estimated": { en: "Estimated", "zh-TW": "預估值", "zh-CN": "预估值" },
+  "calc.slippageLocked": { en: "Using Li.Fi live data", "zh-TW": "使用 Li.Fi 即時數據", "zh-CN": "使用 Li.Fi 实时数据" },
   "calc.oneWay": { en: "Cross-Chain Fees (one-way)", "zh-TW": "跨鏈費用（單次）", "zh-CN": "跨链费用（单次）" },
   "calc.gas": { en: "Gas Fees", "zh-TW": "Gas 費用", "zh-CN": "Gas 费用" },
   "calc.bridge": { en: "Cross-Chain Fee", "zh-TW": "跨鏈手續費", "zh-CN": "跨链手续费" },

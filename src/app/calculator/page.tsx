@@ -111,6 +111,11 @@ function CalculatorContent() {
   const roundTripCost = friction.totalCostUSD * 2;
   const yieldCalc = useMemo(() => calculateNetYield(amountUSD, apy, roundTripCost, holdingDays), [amountUSD, apy, roundTripCost, holdingDays]);
 
+  const slippageLocked = !!liveQuote && sourceChainId !== destChainId;
+  const displaySlippageBps = slippageLocked && amountUSD > 0
+    ? (friction.slippageCostUSD / amountUSD) * 10000
+    : slippageBps;
+
   function fmt(usd: number) { return formatTokenAmount(fromUSD(Math.abs(usd), currency), currency); }
   function fmtS(usd: number) { return (usd < 0 ? "-" : "") + fmt(usd); }
 
@@ -190,10 +195,27 @@ function CalculatorContent() {
           <div>
             <div className="flex justify-between mb-2">
               <label className="text-sm text-muted">{t("calc.slippage")}</label>
-              <span className="text-base font-medium text-foreground">{(slippageBps / 100).toFixed(2)}%</span>
+              <span className="text-base font-medium text-foreground">{(displaySlippageBps / 100).toFixed(2)}%</span>
             </div>
-            <input type="range" value={slippageBps} onChange={(e) => setSlippageBps(Number(e.target.value))} min={1} max={200} className="w-full accent-accent h-2" />
-            <div className="flex justify-between text-sm text-muted mt-1"><span>0.01%</span><span>2%</span></div>
+            {slippageLocked ? (
+              <p className="text-xs text-muted flex items-center gap-1.5">
+                <Zap size={12} className="text-green" /> {t("calc.slippageLocked")}
+              </p>
+            ) : (
+              <>
+                <input
+                  type="range"
+                  value={slippageBps}
+                  onChange={(e) => setSlippageBps(Number(e.target.value))}
+                  min={1}
+                  max={200}
+                  className="w-full accent-accent h-2"
+                />
+                <div className="flex justify-between text-sm text-muted mt-1">
+                  <span>0.01%</span><span>2%</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
