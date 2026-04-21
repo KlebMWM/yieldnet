@@ -8,6 +8,7 @@ import { Search, ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import APYWarningModal from "@/components/APYWarningModal";
+import { track } from "@/lib/analytics";
 
 type SortKey = "apy" | "tvl" | "name";
 
@@ -168,8 +169,8 @@ export default function ExplorePage() {
           <div className="py-20 text-center text-base text-muted">{t("explore.empty")}</div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.slice(0, visibleCount).map((vault) => (
-              <VaultCard key={`${vault.chainId}-${vault.address}`} vault={vault} onSelect={setPendingVault} />
+            {filtered.slice(0, visibleCount).map((vault, i) => (
+              <VaultCard key={`${vault.chainId}-${vault.address}-${i}`} vault={vault} onSelect={setPendingVault} />
             ))}
           </div>
         )}
@@ -191,7 +192,18 @@ export default function ExplorePage() {
 
       <APYWarningModal
         vault={pendingVault}
-        onConfirm={(v) => { setPendingVault(null); navigateToDeposit(v); }}
+        onConfirm={(v) => {
+          track("vault_selected", {
+            vault_name: v.name,
+            protocol: v.protocol,
+            chain_id: v.chainId,
+            apy: v.apy,
+            yield_type: v.yieldType,
+            tvl_usd: v.tvl,
+          });
+          setPendingVault(null);
+          navigateToDeposit(v);
+        }}
         onCancel={() => setPendingVault(null)}
       />
     </>

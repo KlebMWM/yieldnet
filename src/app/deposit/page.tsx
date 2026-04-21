@@ -15,6 +15,7 @@ import {
   Calculator,
   Zap,
 } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 export default function DepositPage() {
   return (
@@ -152,6 +153,7 @@ function DepositContent() {
           href={jumperUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("deposit_action_click", { action: "bridge", vault, protocol, chain_id: chainId, apy: Number(apy) })}
           className="flex items-center justify-center gap-2 rounded-2xl bg-accent/10 border border-accent/20 px-4 py-3.5 text-base font-medium text-accent transition-all hover:bg-accent/20 w-full"
         >
           <ArrowRightLeft size={18} />
@@ -178,6 +180,7 @@ function DepositContent() {
             href={protocolUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("deposit_action_click", { action: "protocol", vault, protocol, chain_id: chainId, apy: Number(apy) })}
             className="flex items-center justify-center gap-2 rounded-2xl bg-green px-4 py-3.5 text-base font-medium text-white transition-all hover:opacity-90 w-full"
           >
             <Zap size={18} />
@@ -192,6 +195,7 @@ function DepositContent() {
       {/* Calculator Link */}
       <Link
         href={`/calculator?${calcParams.toString()}`}
+        onClick={() => track("calculator_opened", { source: "deposit_page", vault, protocol, chain_id: chainId })}
         className="flex items-center justify-center gap-2 rounded-2xl border border-border px-4 py-3.5 text-base font-medium text-muted transition-all hover:border-accent/30 hover:text-foreground w-full"
       >
         <Calculator size={18} />

@@ -9,6 +9,7 @@ import CurrencySelector from "@/components/CurrencySelector";
 import { useI18n } from "@/lib/i18n";
 import { ArrowRight, Clock, Fuel, ArrowLeftRight, TrendingDown, BarChart3, Info, Zap } from "lucide-react";
 import Link from "next/link";
+import { track } from "@/lib/analytics";
 
 export default function CalculatorPage() {
   return (
@@ -115,6 +116,37 @@ function CalculatorContent() {
   const displaySlippageBps = slippageLocked && amountUSD > 0
     ? (friction.slippageCostUSD / amountUSD) * 10000
     : slippageBps;
+
+  useEffect(() => {
+    track("calculator_page_viewed", {
+      preset_vault: presetVault || null,
+      preset_protocol: presetProtocol || null,
+      preset_chain: presetChain ? Number(presetChain) : null,
+      preset_apy: presetApy ? Number(presetApy) : null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      track("calculator_inputs_settled", {
+        amount_usd: Math.round(amountUSD),
+        apy,
+        holding_days: holdingDays,
+        source_chain_id: sourceChainId,
+        dest_chain_id: destChainId,
+        currency,
+        cross_chain: sourceChainId !== destChainId,
+        is_live_data: isLiveData,
+        total_cost_usd: Math.round(friction.totalCostUSD * 100) / 100,
+        net_yield_usd: Math.round(yieldCalc.netYield * 100) / 100,
+        net_apy: Math.round(yieldCalc.netAPY * 100) / 100,
+        breakeven_days: yieldCalc.breakEvenDays === Infinity ? null : Math.ceil(yieldCalc.breakEvenDays),
+        profitable: yieldCalc.netYield >= 0,
+      });
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [amountUSD, apy, holdingDays, sourceChainId, destChainId, currency, isLiveData, friction.totalCostUSD, yieldCalc.netYield, yieldCalc.netAPY, yieldCalc.breakEvenDays]);
 
   function fmt(usd: number) { return formatTokenAmount(fromUSD(Math.abs(usd), currency), currency); }
   function fmtS(usd: number) { return (usd < 0 ? "-" : "") + fmt(usd); }
@@ -262,6 +294,13 @@ function CalculatorContent() {
               <Row label={t("calc.breakeven")} value={yieldCalc.breakEvenDays === Infinity ? t("calc.never") : `~${Math.ceil(yieldCalc.breakEvenDays)} ${t("calc.daysUnit")}`} color="text-yellow" />
             </div>
             <Link href={`/dashboard?${dashboardParams.toString()}`}
+              onClick={() => track("dashboard_opened", {
+                amount_usd: Math.round(amountUSD),
+                apy,
+                holding_days: holdingDays,
+                breakeven_days: yieldCalc.breakEvenDays === Infinity ? null : Math.ceil(yieldCalc.breakEvenDays),
+                profitable: yieldCalc.netYield >= 0,
+              })}
               className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-accent px-4 py-3.5 text-base font-medium text-white transition-all hover:opacity-90 w-full">
               <BarChart3 size={18} /> {t("calc.viewDashboard")}
             </Link>

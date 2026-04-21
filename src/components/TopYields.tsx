@@ -106,7 +106,7 @@ export default function TopYields() {
           const chain = getChainInfo(vault.chainId);
           return (
             <button
-              key={`${vault.chainId}-${vault.address}`}
+              key={`${vault.chainId}-${vault.address}-${i}`}
               onClick={() => setPendingVault(vault)}
               className="tech-card group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-accent/30 hover:bg-card-hover active:scale-[0.98]"
             >

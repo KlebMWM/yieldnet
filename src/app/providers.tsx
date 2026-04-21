@@ -24,9 +24,10 @@ import {
 } from "@rainbow-me/rainbowkit";
 import type { Locale as RKLocale } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ThemeProvider, useTheme } from "@/lib/ThemeContext";
 import { I18nProvider, useI18n } from "@/lib/i18n";
+import { initAnalytics } from "@/lib/analytics";
 
 const config = getDefaultConfig({
   appName: "YieldNet",
@@ -97,6 +98,10 @@ function RainbowKitWrapper({ children }: { children: React.ReactNode }) {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
+
+  useEffect(() => {
+    initAnalytics();
+  }, []);
 
   return (
     <ThemeProvider>
