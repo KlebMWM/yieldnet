@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useMemo, useEffect, useCallback } from "react";
+import { Suspense, useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { getChainInfo, getChainList, USDC_ADDRESSES } from "@/lib/chains";
 import { estimateFrictionCost, calculateNetYield, fetchRealQuote, FrictionCost } from "@/lib/api";
@@ -127,26 +127,47 @@ function CalculatorContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const pendingSettleRef = useRef<Record<string, unknown> | null>(null);
+
   useEffect(() => {
+    const payload = {
+      amount_usd: Math.round(amountUSD),
+      apy,
+      holding_days: holdingDays,
+      source_chain_id: sourceChainId,
+      dest_chain_id: destChainId,
+      currency,
+      cross_chain: sourceChainId !== destChainId,
+      is_live_data: isLiveData,
+      total_cost_usd: Math.round(friction.totalCostUSD * 100) / 100,
+      net_yield_usd: Math.round(yieldCalc.netYield * 100) / 100,
+      net_apy: Math.round(yieldCalc.netAPY * 100) / 100,
+      breakeven_days: yieldCalc.breakEvenDays === Infinity ? null : Math.ceil(yieldCalc.breakEvenDays),
+      profitable: yieldCalc.netYield >= 0,
+    };
+    pendingSettleRef.current = payload;
     const timer = setTimeout(() => {
-      track("calculator_inputs_settled", {
-        amount_usd: Math.round(amountUSD),
-        apy,
-        holding_days: holdingDays,
-        source_chain_id: sourceChainId,
-        dest_chain_id: destChainId,
-        currency,
-        cross_chain: sourceChainId !== destChainId,
-        is_live_data: isLiveData,
-        total_cost_usd: Math.round(friction.totalCostUSD * 100) / 100,
-        net_yield_usd: Math.round(yieldCalc.netYield * 100) / 100,
-        net_apy: Math.round(yieldCalc.netAPY * 100) / 100,
-        breakeven_days: yieldCalc.breakEvenDays === Infinity ? null : Math.ceil(yieldCalc.breakEvenDays),
-        profitable: yieldCalc.netYield >= 0,
-      });
+      track("calculator_inputs_settled", payload);
+      pendingSettleRef.current = null;
     }, 1500);
     return () => clearTimeout(timer);
   }, [amountUSD, apy, holdingDays, sourceChainId, destChainId, currency, isLiveData, friction.totalCostUSD, yieldCalc.netYield, yieldCalc.netAPY, yieldCalc.breakEvenDays]);
+
+  // Flush pending settle when user navigates away before debounce fires.
+  // Covers SPA route change (unmount) and tab close / hard nav (pagehide).
+  useEffect(() => {
+    const flush = () => {
+      if (pendingSettleRef.current) {
+        track("calculator_inputs_settled", pendingSettleRef.current);
+        pendingSettleRef.current = null;
+      }
+    };
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      flush();
+    };
+  }, []);
 
   function fmt(usd: number) { return formatTokenAmount(fromUSD(Math.abs(usd), currency), currency); }
   function fmtS(usd: number) { return (usd < 0 ? "-" : "") + fmt(usd); }
